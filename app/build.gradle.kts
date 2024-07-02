@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "kr.co.hconnect.polihealth_sdk_android"
+    namespace = "kr.co.hconnect.polihealth_sdk_android_app"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "kr.co.hconnect.polihealth_sdk_android"
+        applicationId = "kr.co.hconnect.polihealth_sdk_android_app"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
@@ -50,6 +50,7 @@ android {
 }
 
 dependencies {
+    val lifecycle_version = "2.8.3"
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -59,7 +60,14 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.2")
+    implementation("androidx.navigation:navigation-compose:2.7.7")
+    implementation("com.airbnb.android:lottie-compose:6.4.1")
+
     implementation(files("/Users/gwagmin-u/Documents/0_workspace/aos/bluetoothlib_android/permissionlib/build/outputs/aar/permissionlib-release.aar"))
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:$lifecycle_version")
+
     implementation(project(":polihealth-sdk-android"))
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
