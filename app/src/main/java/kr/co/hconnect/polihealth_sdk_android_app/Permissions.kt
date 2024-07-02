@@ -1,4 +1,4 @@
-package kr.co.hconnect.polihealth_sdk_android
+package kr.co.hconnect.polihealth_sdk_android_app
 
 import android.Manifest
 import android.os.Build

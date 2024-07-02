@@ -1,4 +1,4 @@
-package kr.co.hconnect.polihealth_sdk_android.ui.theme
+package kr.co.hconnect.polihealth_sdk_android_app.ui.theme
 
 import android.app.Activity
 import android.os.Build

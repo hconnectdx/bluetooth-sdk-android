@@ -1,4 +1,4 @@
-package kr.co.hconnect.polihealth_sdk_android.view
+package kr.co.hconnect.polihealth_sdk_android_app.view
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -16,7 +16,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import kr.co.hconnect.bluetoothlib.HCBle
 import kr.co.hconnect.permissionlib.PermissionManager
-import kr.co.hconnect.polihealth_sdk_android.Permissions
+import kr.co.hconnect.polihealth_sdk_android_app.Permissions
 
 @Composable
 fun HomeScreen() {

@@ -1,8 +1,7 @@
-package kr.co.hconnect.polihealth_sdk_android
+package kr.co.hconnect.polihealth_sdk_android_app
 
+import org.junit.Assert.assertEquals
 import org.junit.Test
-
-import org.junit.Assert.*
 
 /**
  * Example local unit test, which will execute on the development machine (host).

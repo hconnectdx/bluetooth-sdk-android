@@ -1,4 +1,4 @@
-package kr.co.hconnect.polihealth_sdk_android
+package kr.co.hconnect.polihealth_sdk_android_app
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -11,15 +11,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import kr.co.hconnect.permissionlib.PermissionManager
-import kr.co.hconnect.polihealth_sdk_android.ui.theme.PolihealthsdkandroidTheme
-import kr.co.hconnect.polihealth_sdk_android.view.HomeScreen
+import kr.co.hconnect.polihealth_sdk_android_app.ui.theme.PolihealthsdkandroidTheme
+import kr.co.hconnect.polihealth_sdk_android_app.view.HomeScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             PolihealthsdkandroidTheme {
-
+                PoliBLE().startScan()
                 // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
