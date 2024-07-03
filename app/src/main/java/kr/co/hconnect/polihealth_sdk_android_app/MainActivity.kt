@@ -8,13 +8,17 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import kr.co.hconnect.permissionlib.PermissionManager
 import kr.co.hconnect.polihealth_sdk_android_app.ui.theme.PolihealthsdkandroidTheme
+import kr.co.hconnect.polihealth_sdk_android_app.view.detail.CharacteristicDetail
 import kr.co.hconnect.polihealth_sdk_android_app.view.detail.DeviceDetailScreen
 import kr.co.hconnect.polihealth_sdk_android_app.view.home.HomeScreen
+import kr.co.hconnect.polihealth_sdk_android_app.viewmodel.BondedDevicesViewModel
+import kr.co.hconnect.polihealth_sdk_android_app.viewmodel.DeviceViewModel
 import kr.co.hconnect.polihealth_sdk_android_app.viewmodel.ScanResultViewModel
 
 class MainActivity : ComponentActivity() {
@@ -36,26 +40,38 @@ class MainActivity : ComponentActivity() {
     override fun onStart() {
         super.onStart()
         PermissionManager.registerPermissionLauncher(this)
+        PoliBLE.init(this)
     }
 }
 
 @Composable
 fun MyApp() {
     val navController = rememberNavController()
-    val scanViewmodel = ScanResultViewModel()
+    val scanViewmodel = viewModel<ScanResultViewModel>()
+    val deviceViewModel = viewModel<DeviceViewModel>()
+    val bondedDevicesViewModel = viewModel<BondedDevicesViewModel>()
+
     MaterialTheme {
         Surface {
             NavHost(navController = navController, startDestination = "home") {
                 composable("home") {
                     HomeScreen(
                         scanViewModel = scanViewmodel,
+                        bondedDevicesViewModel = bondedDevicesViewModel,
+                        deviceViewModel = deviceViewModel,
                         navController = navController
                     )
                 }
-                composable("detail") {
+                composable("deviceDetail") {
                     DeviceDetailScreen(
-                        scanViewModel = scanViewmodel,
-                        navController = navController
+                        navController = navController,
+                        deviceViewModel = deviceViewModel
+                    )
+                }
+                composable("charDetail") {
+                    CharacteristicDetail(
+                        navController = navController,
+                        deviceViewModel = deviceViewModel
                     )
                 }
             }

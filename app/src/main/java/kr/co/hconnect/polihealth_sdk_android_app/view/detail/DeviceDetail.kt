@@ -47,17 +47,13 @@ import kr.co.hconnect.polihealth_sdk_android_app.BLEState
 import kr.co.hconnect.polihealth_sdk_android_app.PoliBLE
 import kr.co.hconnect.polihealth_sdk_android_app.R
 import kr.co.hconnect.polihealth_sdk_android_app.viewmodel.DeviceViewModel
-import kr.co.hconnect.polihealth_sdk_android_app.viewmodel.ScanResultViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DeviceDetailScreen(
     navController: NavController,
-    scanViewModel: ScanResultViewModel = viewModel()
+    deviceViewModel: DeviceViewModel = viewModel()
 ) {
-    val deviceViewModel = viewModel<DeviceViewModel>()
-    deviceViewModel.device.value = scanViewModel.selDevice.value?.device
-
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -82,8 +78,11 @@ fun DeviceDetailScreen(
                 .background(Color.White)
                 .padding(innerPadding)
         ) {
-            scanViewModel.selDevice
-            DeviceDetailContent(deviceViewModel, navController)
+            deviceViewModel.device
+            DeviceDetailContent(
+                deviceViewModel = deviceViewModel,
+                naviController = navController
+            )
         }
     }
 }
@@ -156,8 +155,13 @@ private fun connect(
             onBondState = { bondedState ->
                 viewModel.isBonded.intValue = bondedState
             },
-            onReceive = { data ->
-                Log.d("GATTService", "onReceive: ${data}")
+            onSubscriptionState = { state ->
+                Log.d("GATTService", "onSubscriptionState: $state")
+                deviceViewModel.isSubscribed.value = state
+            },
+            onReceive = { byteArray ->
+                val hexString = byteArray?.joinToString(separator = " ") { byte -> "%02x".format(byte) }
+                Log.d("GATTService", "onCharacteristicChanged: $hexString")
             },
         )
     } ?: {
@@ -218,10 +222,10 @@ private fun LoadingLottie() {
 
 @Composable
 fun DeviceDetailContent(
-    scanViewModel: DeviceViewModel = viewModel(),
+    deviceViewModel: DeviceViewModel = viewModel(),
     naviController: NavController
 ) {
-    val device = scanViewModel.device.value
+    val device = deviceViewModel.device.value
     Column {
         Card(
             modifier = Modifier
@@ -245,8 +249,8 @@ fun DeviceDetailContent(
 
         HorizontalDivider(Modifier.padding(16.dp))
 
-        if (scanViewModel.isBonded.intValue == BLEState.BOND_BONDED &&
-            scanViewModel.isGattConnected.intValue == BLEState.GATT_SUCCESS
+        if (deviceViewModel.isBonded.intValue == BLEState.BOND_BONDED &&
+            deviceViewModel.isGattConnected.intValue == BLEState.GATT_SUCCESS
         ) {
             GattServiceList(
                 PoliBLE.getGattServiceList(),
@@ -300,7 +304,7 @@ fun GattServiceList(
                             IconButton(
                                 onClick = {
                                     PoliBLE.setCharacteristicUUID(characteristic.uuid.toString())
-                                    naviController.navigate("characteristicDetail")
+                                    naviController.navigate("charDetail")
                                 }, modifier = Modifier.weight(1f)
                             ) {
                                 Icon(

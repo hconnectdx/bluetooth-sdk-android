@@ -27,7 +27,7 @@ fun ScanList(
                 Modifier.clickable {
                     PoliBLE.stopScan()
                     scanViewModel.selDevice.value = scanViewModel.scanResults[item]
-                    navController.navigate("detail")
+                    navController.navigate("deviceDetail")
                 }
             ) {
                 ListItem(
