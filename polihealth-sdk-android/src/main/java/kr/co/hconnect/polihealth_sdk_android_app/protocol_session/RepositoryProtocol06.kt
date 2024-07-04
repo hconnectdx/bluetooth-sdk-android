@@ -27,4 +27,7 @@ object RepositoryProtocol06 {
     // 바이트 배열을 16진수 문자열로 변환하는 헬퍼 함수
     private fun ByteArray.toHexString(): String =
         joinToString(separator = " ") { byte -> "%02x".format(byte) }
+
+    fun requestPostProtocol6() {
+    }
 }
