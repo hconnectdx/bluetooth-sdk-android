@@ -4,11 +4,13 @@ import io.ktor.client.request.forms.MultiPartFormDataContent
 import io.ktor.client.request.forms.formData
 import io.ktor.client.request.post
 import io.ktor.client.request.request
+import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.Headers
 import io.ktor.http.HttpMethod
 import io.ktor.util.InternalAPI
 import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.Serializable
 import org.junit.Test
 
 /**
@@ -16,6 +18,20 @@ import org.junit.Test
  *
  * See [testing documentation](http://d.android.com/tools/testing).
  */
+@Serializable
+data class RequestBody(
+    val reqDate: String,
+    val userSno: Int,
+    val sessionId: String,
+    val data: MyData,
+) {
+    @Serializable
+    class MyData(
+        val oxygenVal: Int,
+        val heartRateVal: Int
+    )
+}
+
 class ExampleUnitTest {
     @OptIn(InternalAPI::class)
     @Test
@@ -44,4 +60,27 @@ class ExampleUnitTest {
             e.printStackTrace()
         }
     }
+
+    @Test
+    fun requestProtocol09() = runBlocking {
+        val requestBody = RequestBody(
+            reqDate = "20240704054513",
+            userSno = 3,
+            sessionId = "123",
+            data = RequestBody.MyData(
+                oxygenVal = 98,
+                heartRateVal = 60
+            )
+        )
+        try {
+            val response: HttpResponse =
+                KtorClient.client.post("https://mapi-stg.health-on.co.kr/poli/sleep/protocol9") {
+                    setBody(requestBody)
+                }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
 }
+
+

@@ -4,14 +4,18 @@ import io.ktor.client.HttpClient
 import io.ktor.client.engine.java.Java
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
+import io.ktor.client.request.HttpRequestPipeline
 import io.ktor.client.request.HttpSendPipeline
 import io.ktor.client.request.header
 import io.ktor.client.statement.HttpReceivePipeline
 import io.ktor.client.statement.bodyAsText
+import io.ktor.http.content.OutgoingContent
 import io.ktor.serialization.kotlinx.json.json
+import io.ktor.util.toByteArray
 import kotlinx.serialization.json.Json
 import org.json.JSONException
 import org.json.JSONObject
+import java.io.ByteArrayOutputStream
 
 
 object KtorClient {
@@ -46,10 +50,20 @@ object KtorClient {
             println("Method: ${this.context.method.value}")
             println("URL: ${this.context.url}")
             println("Header: ${this.context.headers.entries()}")
-            println("Body: ${context.body}")
+
+            val requestBody = context.body
+            if (requestBody is OutgoingContent.ByteArrayContent) {
+                println("Body: ${String(requestBody.bytes())}")
+            } else if (requestBody is OutgoingContent.ReadChannelContent) {
+                val byteArray = requestBody.readFrom().toByteArray()
+                println("Body: ${String(byteArray)}")
+            } else {
+                println("Body: ${context.body}")
+            }
+
             proceedWith(this.subject)
         }
-        
+
         client.receivePipeline.intercept(HttpReceivePipeline.State) { response ->
             println()
             println("[Response]")
@@ -61,6 +75,12 @@ object KtorClient {
         }
     }
 
+    /**
+     * TODO 한줄로 쌩자로 오는 json을 읽기 쉽게 pretty하게 변환하는 함수
+     *
+     * @param jsonString
+     * @return prettyJson
+     */
     fun prettyPrintJson(jsonString: String): String {
         var indentLevel = 0
         val indentSpace = 4
