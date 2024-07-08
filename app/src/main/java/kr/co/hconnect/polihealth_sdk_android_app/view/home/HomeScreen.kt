@@ -22,13 +22,14 @@ import androidx.navigation.NavController
 import kr.co.hconnect.permissionlib.PermissionManager
 import kr.co.hconnect.polihealth_sdk_android_app.Permissions
 import kr.co.hconnect.polihealth_sdk_android_app.PoliBLE
-import kr.co.hconnect.polihealth_sdk_android_app.protocol_session.RepositoryProtocol06
+import kr.co.hconnect.polihealth_sdk_android_app.repository.RepositoryProtocol06
 import kr.co.hconnect.polihealth_sdk_android_app.view.home.compose.BLEScanButton
 import kr.co.hconnect.polihealth_sdk_android_app.view.home.compose.BondedList
 import kr.co.hconnect.polihealth_sdk_android_app.view.home.compose.ScanList
 import kr.co.hconnect.polihealth_sdk_android_app.viewmodel.BondedDevicesViewModel
 import kr.co.hconnect.polihealth_sdk_android_app.viewmodel.DeviceViewModel
 import kr.co.hconnect.polihealth_sdk_android_app.viewmodel.ScanResultViewModel
+
 @Composable
 fun RequestPermissions(bondedDevicesViewModel: BondedDevicesViewModel = viewModel()) {
     val context = LocalContext.current
@@ -49,6 +50,7 @@ fun RequestPermissions(bondedDevicesViewModel: BondedDevicesViewModel = viewMode
         }
     }
 }
+
 @RequiresApi(Build.VERSION_CODES.Q)
 @Composable
 fun HomeScreen(

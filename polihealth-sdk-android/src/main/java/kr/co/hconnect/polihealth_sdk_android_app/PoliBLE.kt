@@ -6,9 +6,9 @@ import android.bluetooth.le.ScanResult
 import android.content.Context
 import android.util.Log
 import kr.co.hconnect.bluetoothlib.HCBle
-import kr.co.hconnect.polihealth_sdk_android_app.protocol_session.RepositoryProtocol06
-import kr.co.hconnect.polihealth_sdk_android_app.protocol_session.RepositoryProtocol07
-import kr.co.hconnect.polihealth_sdk_android_app.protocol_session.RepositoryProtocol08
+import kr.co.hconnect.polihealth_sdk_android_app.repository.RepositoryProtocol06
+import kr.co.hconnect.polihealth_sdk_android_app.repository.RepositoryProtocol07
+import kr.co.hconnect.polihealth_sdk_android_app.repository.RepositoryProtocol08
 
 object PoliBLE {
     fun init(context: Context) {
