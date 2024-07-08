@@ -22,7 +22,8 @@ import androidx.navigation.NavController
 import kr.co.hconnect.permissionlib.PermissionManager
 import kr.co.hconnect.polihealth_sdk_android_app.Permissions
 import kr.co.hconnect.polihealth_sdk_android_app.PoliBLE
-import kr.co.hconnect.polihealth_sdk_android_app.repository.RepositoryProtocol06
+import kr.co.hconnect.polihealth_sdk_android_app.api.sleep.SleepProtocol06API
+import kr.co.hconnect.polihealth_sdk_android_app.api.SleepRepository
 import kr.co.hconnect.polihealth_sdk_android_app.view.home.compose.BLEScanButton
 import kr.co.hconnect.polihealth_sdk_android_app.view.home.compose.BondedList
 import kr.co.hconnect.polihealth_sdk_android_app.view.home.compose.ScanList
@@ -73,7 +74,10 @@ fun HomeScreen(
                 Row {
                     Box(modifier = Modifier.width(10.dp))
                     BLEScanButton(scanViewModel = scanViewModel)
-                    Button(onClick = { RepositoryProtocol06.requestPost(context = context) }) {
+                    Button(onClick = { SleepProtocol06API.requestPost(context = context) }) {
+
+                    }
+                    Button(onClick = { SleepRepository().requestStartBand() }) {
 
                     }
                 }

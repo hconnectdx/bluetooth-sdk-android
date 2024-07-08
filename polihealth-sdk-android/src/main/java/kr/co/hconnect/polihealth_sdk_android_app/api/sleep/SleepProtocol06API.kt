@@ -1,4 +1,4 @@
-package kr.co.hconnect.polihealth_sdk_android_app.repository
+package kr.co.hconnect.polihealth_sdk_android_app.api.sleep
 
 import android.content.Context
 import android.net.Uri
@@ -15,8 +15,9 @@ import io.ktor.http.HttpHeaders
 import io.ktor.util.InternalAPI
 import kotlinx.coroutines.runBlocking
 import kr.co.hconnect.polihealth_sdk_android_app.KtorClient
+import kr.co.hconnect.polihealth_sdk_android_app.api.BaseProtocolHandler
 
-object RepositoryProtocol06 : ByteController() {
+object SleepProtocol06API : BaseProtocolHandler() {
     @OptIn(InternalAPI::class)
     @RequiresApi(Build.VERSION_CODES.Q)
     fun requestPost(context: Context) = runBlocking {

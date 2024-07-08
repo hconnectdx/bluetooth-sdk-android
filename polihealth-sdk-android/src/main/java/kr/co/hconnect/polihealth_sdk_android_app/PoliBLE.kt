@@ -6,9 +6,9 @@ import android.bluetooth.le.ScanResult
 import android.content.Context
 import android.util.Log
 import kr.co.hconnect.bluetoothlib.HCBle
-import kr.co.hconnect.polihealth_sdk_android_app.repository.RepositoryProtocol06
-import kr.co.hconnect.polihealth_sdk_android_app.repository.RepositoryProtocol07
-import kr.co.hconnect.polihealth_sdk_android_app.repository.RepositoryProtocol08
+import kr.co.hconnect.polihealth_sdk_android_app.api.sleep.SleepProtocol06API
+import kr.co.hconnect.polihealth_sdk_android_app.api.sleep.SleepProtocal07API
+import kr.co.hconnect.polihealth_sdk_android_app.api.sleep.SleepProtocol08API
 
 object PoliBLE {
     fun init(context: Context) {
@@ -53,17 +53,17 @@ object PoliBLE {
 
                     when (it[0]) {
                         0x06.toByte() -> {
-                            RepositoryProtocol06.addByte(removeFrontTwoBytes(it))
+                            SleepProtocol06API.addByte(removeFrontTwoBytes(it))
                         }
 
                         0x07.toByte() -> {
-                            RepositoryProtocol08.flush(context)
-                            RepositoryProtocol07.addByte(removeFrontTwoBytes(it))
+                            SleepProtocol08API.flush(context)
+                            SleepProtocal07API.addByte(removeFrontTwoBytes(it))
                         }
 
                         0x08.toByte() -> {
-                            RepositoryProtocol06.flush(context)
-                            RepositoryProtocol08.addByte(removeFrontTwoBytes(it))
+                            SleepProtocol06API.flush(context)
+                            SleepProtocol08API.addByte(removeFrontTwoBytes(it))
                         }
 
                         0x09.toByte() -> {

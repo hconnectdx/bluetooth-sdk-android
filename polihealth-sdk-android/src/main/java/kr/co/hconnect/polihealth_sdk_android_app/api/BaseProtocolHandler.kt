@@ -1,4 +1,4 @@
-package kr.co.hconnect.polihealth_sdk_android_app.repository
+package kr.co.hconnect.polihealth_sdk_android_app.api
 
 import android.content.ContentValues
 import android.content.Context
@@ -6,7 +6,7 @@ import android.provider.MediaStore
 import android.util.Log
 import java.io.OutputStream
 
-open class ByteController {
+open class BaseProtocolHandler {
     private var _byteArray: ByteArray = byteArrayOf()
     val byteArray: ByteArray
         get() = _byteArray

@@ -1,14 +1,14 @@
-package kr.co.hconnect.polihealth_sdk_android_app.repository
+package kr.co.hconnect.polihealth_sdk_android_app.api.sleep
 
 import android.util.Log
 
-object RepositoryProtocol07 {
+object SleepProtocal07API {
     private var _byteArray: ByteArray = byteArrayOf()
     val byteArray: ByteArray
         get() = _byteArray
 
     fun addByte(byteArray: ByteArray) {
-        this._byteArray.plus(byteArray)
+        _byteArray.plus(byteArray)
     }
 
     @OptIn(ExperimentalStdlibApi::class)
