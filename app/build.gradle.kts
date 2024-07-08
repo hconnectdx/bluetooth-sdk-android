@@ -18,15 +18,33 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+        buildConfigField(
+            "String", "API_URL",
+            "\"https://mapi-stg.health-on.co.kr\""
+        )
+        buildConfigField(
+            "String",
+            "CLIENT_ID", "\"3270e7da-55b1-4dd4-abb9-5c71295b849b\""
+        )
+        buildConfigField(
+            "String",
+            "CLIENT_SECRET",
+            "\"eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJpbmZyYSI6IkhlYWx0aE9uLVN0YWdpbmciLCJjbGllbnQtaWQiOiIzMjcwZTdkYS01NWIxLTRkZDQtYWJiOS01YzcxMjk1Yjg0OWIifQ.u0rBK-2t3l4RZ113EzudZsKb0Us9PEtiPcFDBv--gYdJf9yZJQOpo41XqzbgSdDa6Z1VDrgZXiOkIZOTeeaEYA\""
+        )
     }
 
     buildTypes {
+        debug {
+
+        }
         release {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+
+            buildConfigField("String", "API_URL", "\"https://api.example.com/\"")
         }
     }
     compileOptions {
@@ -47,6 +65,12 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+
+    buildFeatures {
+        buildConfig = true
+    }
+
+
 }
 
 dependencies {

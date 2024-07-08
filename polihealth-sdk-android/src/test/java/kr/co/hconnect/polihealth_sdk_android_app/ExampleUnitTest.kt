@@ -36,7 +36,7 @@ class ExampleUnitTest {
         )
         try {
             val response: HttpResponse =
-                KtorClient.client.post("https://mapi-stg.health-on.co.kr/poli/sleep/start") {
+                PoliClient.client.post("https://mapi-stg.health-on.co.kr/poli/sleep/start") {
                     setBody(requestBody)
                 }
         } catch (e: Exception) {
@@ -58,7 +58,7 @@ class ExampleUnitTest {
         )
         try {
             val response: HttpResponse =
-                KtorClient.client.post("https://mapi-stg.health-on.co.kr/poli/sleep/protocol9") {
+                PoliClient.client.post("https://mapi-stg.health-on.co.kr/poli/sleep/protocol9") {
                     setBody(requestBody)
                 }
         } catch (e: Exception) {

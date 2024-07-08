@@ -14,7 +14,7 @@ import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
 import io.ktor.util.InternalAPI
 import kotlinx.coroutines.runBlocking
-import kr.co.hconnect.polihealth_sdk_android_app.KtorClient
+import kr.co.hconnect.polihealth_sdk_android_app.PoliClient
 import kr.co.hconnect.polihealth_sdk_android_app.api.BaseProtocolHandler
 
 object SleepProtocol06API : BaseProtocolHandler() {
@@ -25,7 +25,7 @@ object SleepProtocol06API : BaseProtocolHandler() {
             val byteArray = readBytesFromDownload(context, "protocol08.bin")
 
             val response: HttpResponse =
-                KtorClient.client.post("https://mapi-stg.health-on.co.kr/poli/sleep/protocol6") {
+                PoliClient.client.post("https://mapi-stg.health-on.co.kr/poli/sleep/protocol6") {
 
                     body = MultiPartFormDataContent(
                         formData {

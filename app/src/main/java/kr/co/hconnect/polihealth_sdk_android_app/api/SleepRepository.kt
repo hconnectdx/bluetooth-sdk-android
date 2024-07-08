@@ -8,7 +8,10 @@ import kr.co.hconnect.polihealth_sdk_android_app.api.sleep.SleepSessionAPI
 class SleepRepository {
     fun requestStartBand() {
         CoroutineScope(Dispatchers.IO).launch {
-            SleepSessionAPI.requestStartBand()
+            SleepSessionAPI.requestStartBand(
+                reqDate = "20240708074048",
+                userSno = 1
+            )
         }
     }
 }

@@ -41,6 +41,11 @@ class MainActivity : ComponentActivity() {
         super.onStart()
         PermissionManager.registerPermissionLauncher(this)
         PoliBLE.init(this)
+        PoliClient.init(
+            baseUrl = BuildConfig.API_URL,
+            clientId = BuildConfig.CLIENT_ID,
+            clientSecret = BuildConfig.CLIENT_SECRET
+        )
     }
 }
 

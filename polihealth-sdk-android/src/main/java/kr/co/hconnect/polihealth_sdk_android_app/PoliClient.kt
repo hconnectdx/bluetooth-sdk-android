@@ -4,7 +4,6 @@ import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
-import io.ktor.client.request.HttpRequestPipeline
 import io.ktor.client.request.HttpSendPipeline
 import io.ktor.client.request.header
 import io.ktor.client.statement.HttpReceivePipeline
@@ -13,38 +12,46 @@ import io.ktor.http.content.OutgoingContent
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.util.toByteArray
 import kotlinx.serialization.json.Json
-import org.json.JSONException
-import org.json.JSONObject
-import java.io.ByteArrayOutputStream
 
+object PoliClient {
+    private lateinit var _client: HttpClient
+    val client: HttpClient get() = _client
 
-object KtorClient {
-    val client = HttpClient(CIO) {
+    private lateinit var _baseUrl: String
+    val baseUrl: String get() = _baseUrl
 
-        defaultRequest {
-            header("accept", "application/json")
-            header("content-type", "application/json")
-            header("ClientId", "3270e7da-55b1-4dd4-abb9-5c71295b849b")
-            header(
-                "ClientSecret",
-                "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJpbmZyYSI6IkhlYWx0aE9uLVN0YWdpbmciLCJjbGllbnQtaWQiOiIzMjcwZTdkYS01NWIxLTRkZDQtYWJiOS01YzcxMjk1Yjg0OWIifQ.u0rBK-2t3l4RZ113EzudZsKb0Us9PEtiPcFDBv--gYdJf9yZJQOpo41XqzbgSdDa6Z1VDrgZXiOkIZOTeeaEYA"
-            )
+    fun init(
+        baseUrl: String,
+        clientId: String,
+        clientSecret: String
+    ) {
+        _baseUrl = baseUrl
+        _client = HttpClient(CIO) {
+
+            defaultRequest {
+                header("accept", "application/json")
+                header("content-type", "application/json")
+                header("ClientId", clientId)
+                header("ClientSecret", clientSecret)
+                url(baseUrl)
+            }
+            install(ContentNegotiation) {
+                json(Json {
+                    prettyPrint = true
+                    isLenient = true
+                    ignoreUnknownKeys = true
+                })
+            }
+            engine {
+                pipelining = true
+            }
         }
-        install(ContentNegotiation) {
-            json(Json {
-                prettyPrint = true
-                isLenient = true
-                ignoreUnknownKeys = true
-            })
-        }
-        engine {
-            pipelining = true
-        }
+
+        addLoggerInterceptor()
     }
 
-    init {
-
-        client.sendPipeline.intercept(HttpSendPipeline.Before) {
+    private fun addLoggerInterceptor() {
+        _client.sendPipeline.intercept(HttpSendPipeline.Before) {
             println()
             println("[Request]")
             println("Method: ${this.context.method.value}")
@@ -64,7 +71,7 @@ object KtorClient {
             proceedWith(this.subject)
         }
 
-        client.receivePipeline.intercept(HttpReceivePipeline.State) { response ->
+        _client.receivePipeline.intercept(HttpReceivePipeline.State) { response ->
             println()
             println("[Response]")
             println("Status: ${response.status}")
