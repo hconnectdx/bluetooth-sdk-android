@@ -2,7 +2,7 @@ package kr.co.hconnect.polihealth_sdk_android_app.api.sleep
 
 import android.util.Log
 
-object SleepProtocal07API {
+object SleepProtocol07API {
     private var _byteArray: ByteArray = byteArrayOf()
     val byteArray: ByteArray
         get() = _byteArray

@@ -7,7 +7,7 @@ import android.content.Context
 import android.util.Log
 import kr.co.hconnect.bluetoothlib.HCBle
 import kr.co.hconnect.polihealth_sdk_android_app.api.sleep.SleepProtocol06API
-import kr.co.hconnect.polihealth_sdk_android_app.api.sleep.SleepProtocal07API
+import kr.co.hconnect.polihealth_sdk_android_app.api.sleep.SleepProtocol07API
 import kr.co.hconnect.polihealth_sdk_android_app.api.sleep.SleepProtocol08API
 
 object PoliBLE {
@@ -58,7 +58,7 @@ object PoliBLE {
 
                         0x07.toByte() -> {
                             SleepProtocol08API.flush(context)
-                            SleepProtocal07API.addByte(removeFrontTwoBytes(it))
+                            SleepProtocol07API.addByte(removeFrontTwoBytes(it))
                         }
 
                         0x08.toByte() -> {
