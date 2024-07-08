@@ -21,6 +21,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import kr.co.hconnect.permissionlib.PermissionManager
+import kr.co.hconnect.polihealth_sdk_android_app.Permissions
 import kr.co.hconnect.polihealth_sdk_android_app.PoliBLE
 import kr.co.hconnect.polihealth_sdk_android_app.viewmodel.DeviceViewModel
 
@@ -50,10 +52,15 @@ fun CharacteristicDetail(
         },
         content = {
             Column(
-                Modifier.padding(it).fillMaxSize(),
+                Modifier
+                    .padding(it)
+                    .fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Card(onClick = {
+                    PermissionManager.launchPermissions(Permissions.PERMISSION_SDK_31) {
+                        it
+                    }
                     PoliBLE.setCharacteristicNotification(true)
                 }) {
                     Row(Modifier.padding(8.dp)) {

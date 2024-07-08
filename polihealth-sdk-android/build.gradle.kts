@@ -44,13 +44,12 @@ dependencies {
     implementation(libs.material)
     implementation(files("/Users/gwagmin-u/Documents/0_workspace/aos/bluetoothlib_android/bluetoothlib/build/outputs/aar/bluetoothlib-release.aar"))
     implementation("io.ktor:ktor-client-core:$ktor_version")
-    implementation("io.ktor:ktor-client-java:$ktor_version")
+//    implementation("io.ktor:ktor-client-java:$ktor_version")
+    implementation("io.ktor:ktor-client-cio:$ktor_version")
     implementation("io.ktor:ktor-client-content-negotiation:$ktor_version")
     implementation("io.ktor:ktor-serialization-kotlinx-json:$ktor_version")
     implementation("org.slf4j:slf4j-simple:1.7.30")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$serialization_version")
-
-
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

@@ -1,7 +1,7 @@
 package kr.co.hconnect.polihealth_sdk_android_app
 
 import io.ktor.client.HttpClient
-import io.ktor.client.engine.java.Java
+import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.request.HttpRequestPipeline
@@ -19,7 +19,7 @@ import java.io.ByteArrayOutputStream
 
 
 object KtorClient {
-    val client = HttpClient(Java) {
+    val client = HttpClient(CIO) {
 
         defaultRequest {
             header("accept", "application/json")

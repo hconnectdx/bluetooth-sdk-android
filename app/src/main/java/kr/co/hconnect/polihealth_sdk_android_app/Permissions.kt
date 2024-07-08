@@ -13,8 +13,11 @@ object Permissions {
         Manifest.permission.ACCESS_BACKGROUND_LOCATION,
     )
 
+
     val PERMISSION_SDK_30 = arrayOf(
         Manifest.permission.BLUETOOTH,
         Manifest.permission.BLUETOOTH_ADMIN,
+        Manifest.permission.READ_EXTERNAL_STORAGE,
+        Manifest.permission.WRITE_EXTERNAL_STORAGE,
     )
 }

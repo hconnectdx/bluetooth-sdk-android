@@ -1,33 +1,97 @@
 package kr.co.hconnect.polihealth_sdk_android_app.protocol_session
 
+import android.content.Context
+import android.net.Uri
+import android.os.Build
+import android.provider.MediaStore
 import android.util.Log
+import androidx.annotation.RequiresApi
+import io.ktor.client.request.forms.MultiPartFormDataContent
+import io.ktor.client.request.forms.formData
+import io.ktor.client.request.post
+import io.ktor.client.statement.HttpResponse
+import io.ktor.http.ContentType
+import io.ktor.http.Headers
+import io.ktor.http.HttpHeaders
+import io.ktor.util.InternalAPI
+import kotlinx.coroutines.runBlocking
+import kr.co.hconnect.polihealth_sdk_android_app.KtorClient
 
-object RepositoryProtocol06 {
-    private var _byteArray: ByteArray = byteArrayOf()
-    val byteArray: ByteArray
-        get() = _byteArray
+object RepositoryProtocol06 : ByteController() {
+    @OptIn(InternalAPI::class)
+    @RequiresApi(Build.VERSION_CODES.Q)
+    fun requestPost(context: Context) = runBlocking {
+        try {
+            val byteArray = readBytesFromDownload(context, "protocol08.bin")
 
-    // addByte 함수: 바이트 배열을 추가
-    fun addByte(byteArray: ByteArray) {
-        _byteArray += byteArray // 기존의 _byteArray에 새로운 byteArray를 추가
-    }
+            val response: HttpResponse =
+                KtorClient.client.post("https://mapi-stg.health-on.co.kr/poli/sleep/protocol6") {
 
-    // flush 함수: 데이터를 반환하고 _byteArray를 비움
-    fun flush(): ByteArray? {
-        return if (_byteArray.isNotEmpty()) {
-            val tempByteArray = _byteArray.clone() // 현재 _byteArray를 클론
-            _byteArray = byteArrayOf() // _byteArray를 빈 배열로 초기화
-            Log.d("RepositoryProtocol06", tempByteArray.toHexString()) // 클론한 데이터를 로그로 출력
-            tempByteArray // 클론한 데이터를 반환
-        } else {
-            null // 데이터가 없으면 null 반환
+                    body = MultiPartFormDataContent(
+                        formData {
+                            append("reqDate", "20240704054513")
+                            append("userSno", "3")
+                            append("sessionId", "20240705_152230")
+                            append("file", byteArray!!, Headers.build {
+                                append(
+                                    HttpHeaders.ContentDisposition,
+                                    "filename=\"protocol08(6).bin\""
+                                )
+                                append(
+                                    HttpHeaders.ContentType,
+                                    ContentType.Application.OctetStream.toString()
+                                )
+                            })
+                        }
+                    )
+                }
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 
-    // 바이트 배열을 16진수 문자열로 변환하는 헬퍼 함수
-    private fun ByteArray.toHexString(): String =
-        joinToString(separator = " ") { byte -> "%02x".format(byte) }
+    @RequiresApi(Build.VERSION_CODES.Q)
+    fun readBytesFromDownload(context: Context, fileName: String): ByteArray? {
+        val uri: Uri? = getUriFromFileName(context, fileName)
+        return uri?.let {
+            readBytesFromUri(context, it)
+        }
+    }
 
-    fun requestPostProtocol6() {
+    @RequiresApi(Build.VERSION_CODES.Q)
+    private fun getUriFromFileName(context: Context, fileName: String): Uri? {
+        val projection = arrayOf(MediaStore.Files.FileColumns._ID)
+        val selection = "${MediaStore.Files.FileColumns.DISPLAY_NAME} = ?"
+        val selectionArgs = arrayOf(fileName)
+
+        val cursor = context.contentResolver.query(
+            MediaStore.Downloads.EXTERNAL_CONTENT_URI,
+            projection,
+            selection,
+            selectionArgs,
+            null
+        )
+
+        cursor?.use {
+            if (it.moveToFirst()) {
+                val id = it.getLong(it.getColumnIndexOrThrow(MediaStore.Files.FileColumns._ID))
+                return Uri.withAppendedPath(
+                    MediaStore.Downloads.EXTERNAL_CONTENT_URI,
+                    id.toString()
+                )
+            }
+        }
+        return null
+    }
+
+    private fun readBytesFromUri(context: Context, uri: Uri): ByteArray? {
+        return try {
+            context.contentResolver.openInputStream(uri)?.use { inputStream ->
+                inputStream.readBytes()
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
     }
 }

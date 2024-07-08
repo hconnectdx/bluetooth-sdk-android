@@ -2,6 +2,7 @@ package kr.co.hconnect.polihealth_sdk_android_app.view.detail
 
 import android.bluetooth.BluetoothGattService
 import android.bluetooth.BluetoothProfile
+import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -30,6 +31,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -90,6 +92,7 @@ fun DeviceDetailScreen(
 
 @Composable
 private fun ConnectButton(deviceViewModel: DeviceViewModel = viewModel()) {
+    val context = LocalContext.current
     IconButton(onClick = {
         deviceViewModel.isBonded.let {
             val state = it.intValue
@@ -107,7 +110,7 @@ private fun ConnectButton(deviceViewModel: DeviceViewModel = viewModel()) {
                 else -> {
                     Log.d("GATTService", "Connect")
                     try {
-                        connect(deviceViewModel)
+                        connect(context = context, deviceViewModel)
                     } catch (e: Exception) {
                         Log.e("GATTService", "Error: ${e.message}")
                     }
@@ -123,10 +126,12 @@ private fun ConnectButton(deviceViewModel: DeviceViewModel = viewModel()) {
 }
 
 private fun connect(
+    context: Context,
     deviceViewModel: DeviceViewModel?
 ) {
     deviceViewModel?.let { viewModel ->
         PoliBLE.connectDevice(
+            context = context,
             viewModel.device.value!!,
             onConnState = { newState ->
                 when (newState) {
@@ -160,7 +165,8 @@ private fun connect(
                 deviceViewModel.isSubscribed.value = state
             },
             onReceive = { byteArray ->
-                val hexString = byteArray?.joinToString(separator = " ") { byte -> "%02x".format(byte) }
+                val hexString =
+                    byteArray.joinToString(separator = " ") { byte -> "%02x".format(byte) }
                 Log.d("GATTService", "onCharacteristicChanged: $hexString")
             },
         )

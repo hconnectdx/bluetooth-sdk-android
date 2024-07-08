@@ -26,6 +26,7 @@ object PoliBLE {
     }
 
     fun connectDevice(
+        context: Context, // bin파일 저장을 위한 임시 컨텍스트
         device: BluetoothDevice,
         onConnState: (state: Int) -> Unit,
         onGattServiceState: (gatt: Int) -> Unit,
@@ -56,12 +57,12 @@ object PoliBLE {
                         }
 
                         0x07.toByte() -> {
-                            RepositoryProtocol08.flush()
+                            RepositoryProtocol08.flush(context)
                             RepositoryProtocol07.addByte(removeFrontTwoBytes(it))
                         }
 
                         0x08.toByte() -> {
-                            RepositoryProtocol06.flush()
+                            RepositoryProtocol06.flush(context)
                             RepositoryProtocol08.addByte(removeFrontTwoBytes(it))
                         }
 

@@ -1,11 +1,14 @@
 package kr.co.hconnect.polihealth_sdk_android_app.view.home
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -16,14 +19,37 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import kr.co.hconnect.permissionlib.PermissionManager
+import kr.co.hconnect.polihealth_sdk_android_app.Permissions
 import kr.co.hconnect.polihealth_sdk_android_app.PoliBLE
+import kr.co.hconnect.polihealth_sdk_android_app.protocol_session.RepositoryProtocol06
 import kr.co.hconnect.polihealth_sdk_android_app.view.home.compose.BLEScanButton
 import kr.co.hconnect.polihealth_sdk_android_app.view.home.compose.BondedList
 import kr.co.hconnect.polihealth_sdk_android_app.view.home.compose.ScanList
 import kr.co.hconnect.polihealth_sdk_android_app.viewmodel.BondedDevicesViewModel
 import kr.co.hconnect.polihealth_sdk_android_app.viewmodel.DeviceViewModel
 import kr.co.hconnect.polihealth_sdk_android_app.viewmodel.ScanResultViewModel
+@Composable
+fun RequestPermissions(bondedDevicesViewModel: BondedDevicesViewModel = viewModel()) {
+    val context = LocalContext.current
+    val permissions = Permissions.PERMISSION_SDK_31
 
+    LaunchedEffect(Unit) {
+        if (PermissionManager.isGrantedPermissions(context, permissions)) {
+            bondedDevicesViewModel.bondedDevices.value = PoliBLE.getBondedDevices()
+        } else {
+            // 권한이 부여되지 않은 경우 권한 요청
+            PermissionManager.launchPermissions(permissions) { grantedPermissions ->
+                if (grantedPermissions.all { it.value }) {
+                    bondedDevicesViewModel.bondedDevices.value = PoliBLE.getBondedDevices()
+                } else {
+
+                }
+            }
+        }
+    }
+}
+@RequiresApi(Build.VERSION_CODES.Q)
 @Composable
 fun HomeScreen(
     navController: NavController,
@@ -31,9 +57,8 @@ fun HomeScreen(
     deviceViewModel: DeviceViewModel = viewModel(),
     scanViewModel: ScanResultViewModel = viewModel()
 ) {
-    LaunchedEffect(key1 = Unit) {
-        bondedDevicesViewModel.bondedDevices.value = PoliBLE.getBondedDevices()
-    }
+    val context = LocalContext.current
+    RequestPermissions(bondedDevicesViewModel = bondedDevicesViewModel)
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         content = { padding ->
@@ -46,6 +71,9 @@ fun HomeScreen(
                 Row {
                     Box(modifier = Modifier.width(10.dp))
                     BLEScanButton(scanViewModel = scanViewModel)
+                    Button(onClick = { RepositoryProtocol06.requestPost(context = context) }) {
+
+                    }
                 }
                 BondedList(
                     navController = navController,
