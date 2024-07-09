@@ -78,7 +78,7 @@ fun HomeScreen(
                 Row {
                     Box(modifier = Modifier.width(10.dp))
                     BLEScanButton(scanViewModel = scanViewModel)
-                    Button(onClick = { SleepProtocol06API.requestPost(context = context) }) {
+                    Button(onClick = { SleepProtocol06API.testPost(context = context) }) {
 
                     }
                     Button(onClick = {

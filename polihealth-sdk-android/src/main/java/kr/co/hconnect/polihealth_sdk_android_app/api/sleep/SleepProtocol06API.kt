@@ -10,18 +10,55 @@ import io.ktor.client.request.forms.MultiPartFormDataContent
 import io.ktor.client.request.forms.formData
 import io.ktor.client.request.post
 import io.ktor.client.statement.HttpResponse
+import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
+import io.ktor.util.AttributeKey
 import io.ktor.util.InternalAPI
 import kotlinx.coroutines.runBlocking
 import kr.co.hconnect.polihealth_sdk_android_app.PoliClient
 import kr.co.hconnect.polihealth_sdk_android_app.api.BaseProtocolHandler
+import kr.co.hconnect.polihealth_sdk_android_app.api.dto.Sleep06Response
+import kr.co.hconnect.polihealth_sdk_android_app.api.dto.toSleep06Response
 
 object SleepProtocol06API : BaseProtocolHandler() {
+
+    /**
+     * TODO: Protocol06을 서버로 전송하는 API
+     *
+     * @param reqDate ex) 20240704054513 (yyyyMMddHHmmss)
+     * @param byteArray
+     * */
+    @OptIn(InternalAPI::class)
+    suspend fun requestPost(
+        reqDate: String,
+        byteArray: ByteArray
+    ): Sleep06Response {
+        val response: Sleep06Response =
+            PoliClient.client.post("poli/sleep/protocol6") {
+                body = MultiPartFormDataContent(
+                    formData {
+                        append("reqDate", reqDate)
+                        append("userSno", SleepSessionAPI.userSno)
+                        append("sessionId", SleepSessionAPI.sessionId)
+                        append("file", byteArray, Headers.build {
+                            append(
+                                HttpHeaders.ContentDisposition,
+                                "filename=\"\"", // 필수 헤더
+                            )
+                        })
+                    }
+                )
+            }.call.attributes[AttributeKey("body")].toString().toSleep06Response()
+
+        return response
+    }
+
+
     @OptIn(InternalAPI::class)
     @RequiresApi(Build.VERSION_CODES.Q)
-    fun requestPost(context: Context) = runBlocking {
+    fun testPost(context: Context) = runBlocking {
         try {
             val byteArray = readBytesFromDownload(context, "protocol08.bin")
 
@@ -35,12 +72,12 @@ object SleepProtocol06API : BaseProtocolHandler() {
                             append("file", byteArray!!, Headers.build {
                                 append(
                                     HttpHeaders.ContentDisposition,
-                                    "filename=\"protocol08(6).bin\""
+                                    "filename=\"\""
                                 )
-                                append(
-                                    HttpHeaders.ContentType,
-                                    ContentType.Application.OctetStream.toString()
-                                )
+//                                append(
+//                                    HttpHeaders.ContentType,
+//                                    ContentType.Application.OctetStream.toString()
+//                                )
                             })
                         }
                     )

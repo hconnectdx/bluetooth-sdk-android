@@ -165,6 +165,15 @@ private fun connect(
                 deviceViewModel.isSubscribed.value = state
             },
             onReceive = { byteArray ->
+                when (byteArray[0]) {
+                    ProtocolType.SLEEP_START -> {
+                        Log.d("GATTService", "Sleep Start!")
+                    }
+
+                    ProtocolType.SLEEP_END -> {
+                        Log.d("GATTService", "Sleep End!")
+                    }
+                }
                 val hexString =
                     byteArray.joinToString(separator = " ") { byte -> "%02x".format(byte) }
                 Log.d("GATTService", "onCharacteristicChanged: $hexString")
