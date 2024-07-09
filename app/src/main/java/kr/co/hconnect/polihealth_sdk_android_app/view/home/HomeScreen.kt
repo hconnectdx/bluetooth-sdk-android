@@ -1,6 +1,7 @@
 package kr.co.hconnect.polihealth_sdk_android_app.view.home
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,6 +20,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kr.co.hconnect.permissionlib.PermissionManager
 import kr.co.hconnect.polihealth_sdk_android_app.Permissions
 import kr.co.hconnect.polihealth_sdk_android_app.PoliBLE
@@ -77,7 +81,17 @@ fun HomeScreen(
                     Button(onClick = { SleepProtocol06API.requestPost(context = context) }) {
 
                     }
-                    Button(onClick = { SleepRepository().requestStartBand() }) {
+                    Button(onClick = {
+                        CoroutineScope(Dispatchers.IO).launch {
+                            val a = SleepRepository().requestStartBand()
+                            Log.d("HomeScreen", a.retCd!!)
+                            Log.d("HomeScreen", a.resDate!!)
+                            Log.d("HomeScreen", a.retMsg!!)
+                            a.data?.sessionId?.let { Log.d("HomeScreen", it) }
+                            Log.d("HomeScreen", a.toString())
+                        }
+
+                    }) {
 
                     }
                 }

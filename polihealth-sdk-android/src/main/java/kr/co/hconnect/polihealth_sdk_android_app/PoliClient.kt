@@ -10,6 +10,7 @@ import io.ktor.client.statement.HttpReceivePipeline
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.content.OutgoingContent
 import io.ktor.serialization.kotlinx.json.json
+import io.ktor.util.AttributeKey
 import io.ktor.util.toByteArray
 import kotlinx.serialization.json.Json
 
@@ -50,6 +51,7 @@ object PoliClient {
         addLoggerInterceptor()
     }
 
+
     private fun addLoggerInterceptor() {
         _client.sendPipeline.intercept(HttpSendPipeline.Before) {
             println()
@@ -71,14 +73,16 @@ object PoliClient {
             proceedWith(this.subject)
         }
 
-        _client.receivePipeline.intercept(HttpReceivePipeline.State) { response ->
+        client.receivePipeline.intercept(HttpReceivePipeline.After) { response ->
             println()
             println("[Response]")
             println("Status: ${response.status}")
             println("Method: ${response.call.request.method.value}")
             println("URL: ${response.call.request.url}")
             println("Header ${response.headers.entries()}")
-            println("Body: ${prettyPrintJson(response.bodyAsText())}")
+            val bodyText = prettyPrintJson(response.bodyAsText())
+            println("Body: $bodyText")
+            response.call.attributes.put(AttributeKey("body"), bodyText)
         }
     }
 
