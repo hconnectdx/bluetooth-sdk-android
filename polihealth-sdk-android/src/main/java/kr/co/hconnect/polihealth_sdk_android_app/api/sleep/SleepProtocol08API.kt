@@ -15,8 +15,8 @@ import io.ktor.util.InternalAPI
 import kotlinx.coroutines.runBlocking
 import kr.co.hconnect.polihealth_sdk_android_app.PoliClient
 import kr.co.hconnect.polihealth_sdk_android_app.api.BaseProtocolHandler
-import kr.co.hconnect.polihealth_sdk_android_app.api.dto.Sleep06Response
-import kr.co.hconnect.polihealth_sdk_android_app.api.dto.toSleep06Response
+import kr.co.hconnect.polihealth_sdk_android_app.api.dto.response.Sleep06Response
+import kr.co.hconnect.polihealth_sdk_android_app.api.dto.response.toSleep06Response
 
 object SleepProtocol08API : BaseProtocolHandler() {
     /**
@@ -31,7 +31,7 @@ object SleepProtocol08API : BaseProtocolHandler() {
         byteArray: ByteArray
     ): Sleep06Response {
         val response: Sleep06Response =
-            PoliClient.client.post("poli/sleep/protocol6") {
+            PoliClient.client.post("poli/sleep/protocol8") {
                 body = MultiPartFormDataContent(
                     formData {
                         append("reqDate", reqDate)
@@ -40,7 +40,7 @@ object SleepProtocol08API : BaseProtocolHandler() {
                         append("file", byteArray, Headers.build {
                             append(
                                 HttpHeaders.ContentDisposition,
-                                "filename=\"protocol06.bin\"",
+                                "filename=\"\"",
                             )
                         })
                     }
@@ -58,7 +58,7 @@ object SleepProtocol08API : BaseProtocolHandler() {
             val byteArray = SleepProtocol06API.readBytesFromDownload(context, "protocol08.bin")
 
             val response: HttpResponse =
-                PoliClient.client.post("https://mapi-stg.health-on.co.kr/poli/sleep/protocol6") {
+                PoliClient.client.post("https://mapi-stg.health-on.co.kr/poli/sleep/protocol8") {
                     body = MultiPartFormDataContent(
                         formData {
                             append("reqDate", "20240704054513")
@@ -67,12 +67,8 @@ object SleepProtocol08API : BaseProtocolHandler() {
                             append("file", byteArray!!, Headers.build {
                                 append(
                                     HttpHeaders.ContentDisposition,
-                                    "formData;"
+                                    "filename=\"\"",
                                 )
-//                                append(
-//                                    HttpHeaders.ContentType,
-//                                    ContentType.Application.OctetStream.toString()
-//                                )
                             })
                         }
                     )

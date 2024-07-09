@@ -6,9 +6,11 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kr.co.hconnect.polihealth_sdk_android_app.DateUtil
-import kr.co.hconnect.polihealth_sdk_android_app.api.dto.Sleep06Response
+import kr.co.hconnect.polihealth_sdk_android_app.api.dto.request.HRSpO2
+import kr.co.hconnect.polihealth_sdk_android_app.api.dto.response.Sleep06Response
 import kr.co.hconnect.polihealth_sdk_android_app.api.sleep.SleepProtocol06API
 import kr.co.hconnect.polihealth_sdk_android_app.api.sleep.SleepProtocol08API
+import kr.co.hconnect.polihealth_sdk_android_app.api.sleep.SleepProtocol09API
 
 class SleepApiService {
     private val TAG = "SleepApiService"
@@ -39,14 +41,14 @@ class SleepApiService {
     }
 
     fun sendProtocol08(context: Context? = null) {
-        val protocol6Bytes = SleepProtocol08API.flush(context)
-        if (protocol6Bytes.isNotEmpty()) {
+        val protocol8Bytes = SleepProtocol08API.flush(context)
+        if (protocol8Bytes.isNotEmpty()) {
             CoroutineScope(Dispatchers.IO).launch {
                 try {
                     val response: Sleep06Response =
-                        SleepProtocol06API.requestPost(
+                        SleepProtocol08API.requestPost(
                             DateUtil.getCurrentDateTime(),
-                            protocol6Bytes
+                            protocol8Bytes
                         )
                     when (response.retCd) {
                         "0" -> {
@@ -60,6 +62,28 @@ class SleepApiService {
                 } catch (e: Exception) {
                     Log.e(TAG, "통신에 실패했습니다. ${e.message}")
                 }
+            }
+        }
+    }
+
+    fun sendProtocol09(hrSpo2: HRSpO2) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val response: Sleep06Response = SleepProtocol09API.requestPost(
+                    DateUtil.getCurrentDateTime(),
+                    hrSpo2
+                )
+                when (response.retCd) {
+                    "0" -> {
+                        Log.d(TAG, "Protocol09 전송 성공")
+                    }
+
+                    else -> {
+
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "통신에 실패했습니다. ${e.message}")
             }
         }
     }
