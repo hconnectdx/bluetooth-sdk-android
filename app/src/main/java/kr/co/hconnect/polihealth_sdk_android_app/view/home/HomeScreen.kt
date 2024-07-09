@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
@@ -28,6 +29,10 @@ import kr.co.hconnect.polihealth_sdk_android_app.Permissions
 import kr.co.hconnect.polihealth_sdk_android_app.PoliBLE
 import kr.co.hconnect.polihealth_sdk_android_app.api.sleep.SleepProtocol06API
 import kr.co.hconnect.polihealth_sdk_android_app.api.SleepRepository
+import kr.co.hconnect.polihealth_sdk_android_app.api.dto.request.HRSpO2
+import kr.co.hconnect.polihealth_sdk_android_app.api.sleep.SleepProtocol07API
+import kr.co.hconnect.polihealth_sdk_android_app.api.sleep.SleepProtocol08API
+import kr.co.hconnect.polihealth_sdk_android_app.api.sleep.SleepProtocol09API
 import kr.co.hconnect.polihealth_sdk_android_app.view.home.compose.BLEScanButton
 import kr.co.hconnect.polihealth_sdk_android_app.view.home.compose.BondedList
 import kr.co.hconnect.polihealth_sdk_android_app.view.home.compose.ScanList
@@ -75,24 +80,48 @@ fun HomeScreen(
                     .fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Row {
-                    Box(modifier = Modifier.width(10.dp))
-                    BLEScanButton(scanViewModel = scanViewModel)
-                    Button(onClick = { SleepProtocol06API.testPost(context = context) }) {
+                Column {
+                    Row {
+                        Box(modifier = Modifier.width(10.dp))
+                        BLEScanButton(scanViewModel = scanViewModel)
+                        Button(onClick = {
+                            CoroutineScope(Dispatchers.IO).launch {
+                                val a = SleepRepository().requestStartBand()
+                                Log.d("HomeScreen", a.retCd!!)
+                                Log.d("HomeScreen", a.resDate!!)
+                                Log.d("HomeScreen", a.retMsg!!)
+                                a.data?.sessionId?.let { Log.d("HomeScreen", it) }
+                                Log.d("HomeScreen", a.toString())
+                            }
 
-                    }
-                    Button(onClick = {
-                        CoroutineScope(Dispatchers.IO).launch {
-                            val a = SleepRepository().requestStartBand()
-                            Log.d("HomeScreen", a.retCd!!)
-                            Log.d("HomeScreen", a.resDate!!)
-                            Log.d("HomeScreen", a.retMsg!!)
-                            a.data?.sessionId?.let { Log.d("HomeScreen", it) }
-                            Log.d("HomeScreen", a.toString())
+                        }) {
+                            Text(text = "Start Band")
                         }
 
-                    }) {
-
+                        //                    Button(onClick = { SleepProtocol09API.testPost(context = context) }) {
+                        //                        Text(text = "Test Protocol9")
+                        //                    }
+                    }
+                    Row {
+                        Button(onClick = { SleepProtocol06API.testPost(context = context) }) {
+                            Text(text = "Test6")
+                        }
+                        Button(onClick = { SleepProtocol07API.testPost(context = context) }) {
+                            Text(text = "Test7")
+                        }
+                        Button(onClick = { SleepProtocol08API.testPost(context = context) }) {
+                            Text(text = "Test8")
+                        }
+                        Button(onClick = {
+                            SleepProtocol09API.testPost(
+                                hrSpO2 = HRSpO2(
+                                    100,
+                                    120
+                                )
+                            )
+                        }) {
+                            Text(text = "Test9")
+                        }
                     }
                 }
                 BondedList(

@@ -3,13 +3,11 @@ package kr.co.hconnect.polihealth_sdk_android_app.api.sleep
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
-import io.ktor.client.statement.bodyAsText
 import io.ktor.util.AttributeKey
-import io.ktor.util.InternalAPI
 import kr.co.hconnect.polihealth_sdk_android_app.PoliClient
-import kr.co.hconnect.polihealth_sdk_android_app.api.RequestBody
-import kr.co.hconnect.polihealth_sdk_android_app.api.dto.SleepStartResponse
-import kr.co.hconnect.polihealth_sdk_android_app.api.dto.toSleepStartResponse
+import kr.co.hconnect.polihealth_sdk_android_app.api.dto.request.RequestBody
+import kr.co.hconnect.polihealth_sdk_android_app.api.dto.response.SleepStartResponse
+import kr.co.hconnect.polihealth_sdk_android_app.api.dto.response.toSleepStartResponse
 
 object SleepSessionAPI {
     var sessionId: String = ""

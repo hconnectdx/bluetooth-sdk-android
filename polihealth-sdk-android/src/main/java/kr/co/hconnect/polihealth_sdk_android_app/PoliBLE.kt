@@ -6,9 +6,11 @@ import android.bluetooth.le.ScanResult
 import android.content.Context
 import android.util.Log
 import kr.co.hconnect.bluetoothlib.HCBle
+import kr.co.hconnect.polihealth_sdk_android_app.api.dto.request.HRSpO2
 import kr.co.hconnect.polihealth_sdk_android_app.api.sleep.SleepProtocol06API
 import kr.co.hconnect.polihealth_sdk_android_app.api.sleep.SleepProtocol07API
 import kr.co.hconnect.polihealth_sdk_android_app.api.sleep.SleepProtocol08API
+import kr.co.hconnect.polihealth_sdk_android_app.api.sleep.SleepProtocol09API
 import kr.co.hconnect.polihealth_sdk_android_app.service.sleep.SleepApiService
 
 object PoliBLE {
@@ -28,7 +30,7 @@ object PoliBLE {
     }
 
     fun connectDevice(
-        context: Context, // bin파일 저장을 위한 임시 컨텍스트
+        context: Context? = null, // bin파일 저장을 위한 임시 컨텍스트
         device: BluetoothDevice,
         onConnState: (state: Int) -> Unit,
         onGattServiceState: (gatt: Int) -> Unit,
@@ -60,20 +62,27 @@ object PoliBLE {
                         }
 
                         0x06.toByte() -> {
-                            SleepProtocol06API.addByte(removeFrontTwoBytes(it))
+                            SleepProtocol06API.addByte(removeFrontTwoBytes(it, 2))
                         }
 
                         0x07.toByte() -> {
 //                            SleepProtocol08API.flush(context)
-                            SleepProtocol07API.addByte(removeFrontTwoBytes(it))
+                            SleepApiService().sendProtocol08(context)
+                            SleepProtocol07API.addByte(removeFrontTwoBytes(it, 2))
                         }
 
                         0x08.toByte() -> {
                             SleepApiService().sendProtocol06(context)
-                            SleepProtocol08API.addByte(removeFrontTwoBytes(it))
+                            SleepProtocol08API.addByte(removeFrontTwoBytes(it, 2))
                         }
 
                         0x09.toByte() -> {
+                            val hrSpO2: HRSpO2 =
+                                HRSpO2Parser.asciiToHRSpO2(removeFrontTwoBytes(it, 1))
+
+//                            SleepProtocol09API.requestPost(
+//                                DateUtil.getCurrentDateTime(), hrSpO2
+//                            )
                             Log.d("PoliBLE", "RepositoryProtocol09 를 전송하였습니다.")
                         }
                     }
@@ -87,10 +96,10 @@ object PoliBLE {
     }
 
 
-    private fun removeFrontTwoBytes(byteArray: ByteArray): ByteArray {
+    private fun removeFrontTwoBytes(byteArray: ByteArray, size: Int): ByteArray {
         // 배열의 길이가 2 이상인 경우에만 앞의 2바이트를 제거
-        if (byteArray.size > 2) {
-            return byteArray.copyOfRange(2, byteArray.size)
+        if (byteArray.size > size) {
+            return byteArray.copyOfRange(size, byteArray.size)
         }
         // 배열의 길이가 2 이하인 경우 빈 배열 반환
         return ByteArray(0)

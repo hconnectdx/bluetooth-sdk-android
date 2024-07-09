@@ -1,4 +1,4 @@
-package kr.co.hconnect.polihealth_sdk_android_app.api.dto
+package kr.co.hconnect.polihealth_sdk_android_app.api.dto.response
 
 import org.json.JSONObject
 

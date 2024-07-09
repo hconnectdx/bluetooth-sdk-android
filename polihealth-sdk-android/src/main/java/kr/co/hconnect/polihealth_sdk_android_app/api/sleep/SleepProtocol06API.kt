@@ -10,8 +10,6 @@ import io.ktor.client.request.forms.MultiPartFormDataContent
 import io.ktor.client.request.forms.formData
 import io.ktor.client.request.post
 import io.ktor.client.statement.HttpResponse
-import io.ktor.client.statement.bodyAsText
-import io.ktor.http.ContentType
 import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
 import io.ktor.util.AttributeKey
@@ -19,8 +17,8 @@ import io.ktor.util.InternalAPI
 import kotlinx.coroutines.runBlocking
 import kr.co.hconnect.polihealth_sdk_android_app.PoliClient
 import kr.co.hconnect.polihealth_sdk_android_app.api.BaseProtocolHandler
-import kr.co.hconnect.polihealth_sdk_android_app.api.dto.Sleep06Response
-import kr.co.hconnect.polihealth_sdk_android_app.api.dto.toSleep06Response
+import kr.co.hconnect.polihealth_sdk_android_app.api.dto.response.Sleep06Response
+import kr.co.hconnect.polihealth_sdk_android_app.api.dto.response.toSleep06Response
 
 object SleepProtocol06API : BaseProtocolHandler() {
 
