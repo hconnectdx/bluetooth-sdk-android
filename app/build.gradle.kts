@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "kr.co.hconnect.polihealth_sdk_android"
+    namespace = "kr.co.hconnect.polihealth_sdk_android_app"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "kr.co.hconnect.polihealth_sdk_android"
+        applicationId = "kr.co.hconnect.polihealth_sdk_android_app"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
@@ -18,15 +18,33 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+        buildConfigField(
+            "String", "API_URL",
+            "\"https://mapi-stg.health-on.co.kr\""
+        )
+        buildConfigField(
+            "String",
+            "CLIENT_ID", "\"3270e7da-55b1-4dd4-abb9-5c71295b849b\""
+        )
+        buildConfigField(
+            "String",
+            "CLIENT_SECRET",
+            "\"eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJpbmZyYSI6IkhlYWx0aE9uLVN0YWdpbmciLCJjbGllbnQtaWQiOiIzMjcwZTdkYS01NWIxLTRkZDQtYWJiOS01YzcxMjk1Yjg0OWIifQ.u0rBK-2t3l4RZ113EzudZsKb0Us9PEtiPcFDBv--gYdJf9yZJQOpo41XqzbgSdDa6Z1VDrgZXiOkIZOTeeaEYA\""
+        )
     }
 
     buildTypes {
+        debug {
+
+        }
         release {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+
+            buildConfigField("String", "API_URL", "\"https://api.example.com/\"")
         }
     }
     compileOptions {
@@ -47,9 +65,16 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+
+    buildFeatures {
+        buildConfig = true
+    }
+
+
 }
 
 dependencies {
+    val lifecycle_version = "2.8.3"
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -59,8 +84,15 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
-    implementation(files("/Users/gwagmin-u/Documents/0_workspace/aos/bluetoothlib_android/bluetoothlib/build/outputs/aar/bluetoothlib-release.aar"))
+
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.2")
+    implementation("androidx.navigation:navigation-compose:2.7.7")
+    implementation("com.airbnb.android:lottie-compose:6.4.1")
+
     implementation(files("/Users/gwagmin-u/Documents/0_workspace/aos/bluetoothlib_android/permissionlib/build/outputs/aar/permissionlib-release.aar"))
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:$lifecycle_version")
+
+    implementation(project(":polihealth-sdk-android"))
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

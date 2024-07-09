@@ -19,6 +19,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "polihealth-sdk-android"
+rootProject.name = "polihealth-sdk-android-app"
 include(":app")
- 
+include(":polihealth-sdk-android")
