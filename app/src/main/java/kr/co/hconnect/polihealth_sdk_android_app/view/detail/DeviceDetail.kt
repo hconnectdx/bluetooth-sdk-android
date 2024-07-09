@@ -47,6 +47,7 @@ import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import kr.co.hconnect.polihealth_sdk_android_app.BLEState
 import kr.co.hconnect.polihealth_sdk_android_app.PoliBLE
+import kr.co.hconnect.polihealth_sdk_android_app.ProtocolType
 import kr.co.hconnect.polihealth_sdk_android_app.R
 import kr.co.hconnect.polihealth_sdk_android_app.viewmodel.DeviceViewModel
 

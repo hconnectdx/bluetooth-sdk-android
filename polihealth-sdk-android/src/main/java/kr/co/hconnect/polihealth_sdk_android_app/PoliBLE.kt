@@ -54,6 +54,11 @@ object PoliBLE {
                 byteArray?.let {
 
                     when (it[0]) {
+                        0x04.toByte() -> {
+                            Log.d("PoliBLE", "RepositoryProtocol04 를 전송하였습니다.")
+                            onReceive.invoke(it)
+                        }
+
                         0x06.toByte() -> {
                             SleepProtocol06API.addByte(removeFrontTwoBytes(it))
                         }
