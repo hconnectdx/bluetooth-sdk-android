@@ -47,6 +47,7 @@ import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import kr.co.hconnect.polihealth_sdk_android_app.BLEState
 import kr.co.hconnect.polihealth_sdk_android_app.PoliBLE
+import kr.co.hconnect.polihealth_sdk_android_app.ProtocolType
 import kr.co.hconnect.polihealth_sdk_android_app.R
 import kr.co.hconnect.polihealth_sdk_android_app.viewmodel.DeviceViewModel
 
@@ -165,6 +166,17 @@ private fun connect(
                 deviceViewModel.isSubscribed.value = state
             },
             onReceive = { byteArray ->
+                Log.d("GATTService", "onReceive: ${byteArray[0]}")
+                Log.d("GATTService", "onReceive: ${ProtocolType.SLEEP_START}")
+                when (byteArray[0]) {
+                    ProtocolType.SLEEP_START -> {
+                        Log.d("GATTService", "Sleep Start!")
+                    }
+
+                    ProtocolType.SLEEP_END -> {
+                        Log.d("GATTService", "Sleep End!")
+                    }
+                }
                 val hexString =
                     byteArray.joinToString(separator = " ") { byte -> "%02x".format(byte) }
                 Log.d("GATTService", "onCharacteristicChanged: $hexString")
