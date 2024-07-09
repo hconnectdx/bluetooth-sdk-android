@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
+import android.util.Log
 import androidx.annotation.RequiresApi
 import io.ktor.client.request.forms.MultiPartFormDataContent
 import io.ktor.client.request.forms.formData
@@ -26,12 +27,11 @@ object SleepProtocol06API : BaseProtocolHandler() {
 
             val response: HttpResponse =
                 PoliClient.client.post("https://mapi-stg.health-on.co.kr/poli/sleep/protocol6") {
-
                     body = MultiPartFormDataContent(
                         formData {
                             append("reqDate", "20240704054513")
-                            append("userSno", "3")
-                            append("sessionId", "20240705_152230")
+                            append("userSno", SleepSessionAPI.userSno)
+                            append("sessionId", SleepSessionAPI.sessionId)
                             append("file", byteArray!!, Headers.build {
                                 append(
                                     HttpHeaders.ContentDisposition,
@@ -45,6 +45,9 @@ object SleepProtocol06API : BaseProtocolHandler() {
                         }
                     )
                 }
+            Log.d("SleepProtocol06API", "userSno: ${SleepSessionAPI.userSno}")
+            Log.d("SleepProtocol06API", "SessionId: ${SleepSessionAPI.sessionId}")
+
         } catch (e: Exception) {
             e.printStackTrace()
         }
