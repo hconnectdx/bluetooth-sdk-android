@@ -2,8 +2,11 @@ package kr.co.hconnect.polihealth_sdk_android_app.api
 
 import android.content.ContentValues
 import android.content.Context
+import android.os.Build
 import android.provider.MediaStore
 import android.util.Log
+import androidx.annotation.RequiresApi
+import kr.co.hconnect.polihealth_sdk_android_app.DateUtil
 import java.io.OutputStream
 
 open class BaseProtocolHandler {
@@ -17,16 +20,25 @@ open class BaseProtocolHandler {
     }
 
     // flush 함수: 데이터를 반환하고 _byteArray를 비움
-    fun flush(context: Context): ByteArray? {
-        return if (_byteArray.isNotEmpty()) {
-            val tempByteArray = _byteArray.clone() // 현재 _byteArray를 클론
-            _byteArray = byteArrayOf() // _byteArray를 빈 배열로 초기화
-            Log.d("RepositoryProtocol06", tempByteArray.toHexString()) // 클론한 데이터를 로그로 출력
-            saveToFile(context, tempByteArray, "protocol08.bin") // 클론한 데이터를 파일로 저장
-            tempByteArray // 클론한 데이터를 반환
-        } else {
-            null // 데이터가 없으면 null 반환
+
+    fun flush(context: Context?): ByteArray {
+
+        if (_byteArray.isEmpty()) {
+            return byteArrayOf()
         }
+
+        val tempByteArray = _byteArray.clone() // 현재 _byteArray를 클론
+
+        _byteArray = byteArrayOf()
+        Log.d("RepositoryProtocol06", tempByteArray.toHexString())
+        context?.let {
+            saveToFile(
+                it,
+                tempByteArray,
+                "protocol${DateUtil.getCurrentDateTime()}.bin"
+            )
+        } // 클론한 데이터를 파일로 저장
+        return tempByteArray // 클론한 데이터를 반환
     }
 
     // 바이트 배열을 16진수 문자열로 변환하는 헬퍼 함수

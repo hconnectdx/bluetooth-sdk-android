@@ -166,8 +166,6 @@ private fun connect(
                 deviceViewModel.isSubscribed.value = state
             },
             onReceive = { byteArray ->
-                Log.d("GATTService", "onReceive: ${byteArray[0]}")
-                Log.d("GATTService", "onReceive: ${ProtocolType.SLEEP_START}")
                 when (byteArray[0]) {
                     ProtocolType.SLEEP_START -> {
                         Log.d("GATTService", "Sleep Start!")

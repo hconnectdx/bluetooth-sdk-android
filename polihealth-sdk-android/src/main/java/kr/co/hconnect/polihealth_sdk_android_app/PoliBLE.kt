@@ -9,8 +9,10 @@ import kr.co.hconnect.bluetoothlib.HCBle
 import kr.co.hconnect.polihealth_sdk_android_app.api.sleep.SleepProtocol06API
 import kr.co.hconnect.polihealth_sdk_android_app.api.sleep.SleepProtocol07API
 import kr.co.hconnect.polihealth_sdk_android_app.api.sleep.SleepProtocol08API
+import kr.co.hconnect.polihealth_sdk_android_app.service.sleep.SleepApiService
 
 object PoliBLE {
+    private const val TAG = "PoliBLE"
     fun init(context: Context) {
         HCBle.init(context)
     }
@@ -62,12 +64,12 @@ object PoliBLE {
                         }
 
                         0x07.toByte() -> {
-                            SleepProtocol08API.flush(context)
+//                            SleepProtocol08API.flush(context)
                             SleepProtocol07API.addByte(removeFrontTwoBytes(it))
                         }
 
                         0x08.toByte() -> {
-                            SleepProtocol06API.flush(context)
+                            SleepApiService().sendProtocol06(context)
                             SleepProtocol08API.addByte(removeFrontTwoBytes(it))
                         }
 
@@ -83,6 +85,7 @@ object PoliBLE {
             }
         )
     }
+
 
     private fun removeFrontTwoBytes(byteArray: ByteArray): ByteArray {
         // 배열의 길이가 2 이상인 경우에만 앞의 2바이트를 제거
