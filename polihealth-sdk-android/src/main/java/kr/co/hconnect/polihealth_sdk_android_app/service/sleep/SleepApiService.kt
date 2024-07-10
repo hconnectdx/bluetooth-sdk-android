@@ -8,9 +8,8 @@ import kotlinx.coroutines.launch
 import kr.co.hconnect.polihealth_sdk_android_app.DateUtil
 import kr.co.hconnect.polihealth_sdk_android_app.api.dto.request.HRSpO2
 import kr.co.hconnect.polihealth_sdk_android_app.api.dto.response.BaseResponse
-import kr.co.hconnect.polihealth_sdk_android_app.api.dto.response.Sleep06Response
-import kr.co.hconnect.polihealth_sdk_android_app.api.dto.response.SleepEndResponse
-import kr.co.hconnect.polihealth_sdk_android_app.api.dto.response.SleepStartResponse
+import kr.co.hconnect.polihealth_sdk_android_app.api.dto.response.SleepResultResponse
+import kr.co.hconnect.polihealth_sdk_android_app.api.dto.response.SleepCommResponse
 import kr.co.hconnect.polihealth_sdk_android_app.api.sleep.SleepProtocol06API
 import kr.co.hconnect.polihealth_sdk_android_app.api.sleep.SleepProtocol07API
 import kr.co.hconnect.polihealth_sdk_android_app.api.sleep.SleepProtocol08API
@@ -20,37 +19,25 @@ import kr.co.hconnect.polihealth_sdk_android_app.api.sleep.SleepSessionAPI
 class SleepApiService {
     private val TAG = "SleepApiService"
 
-    suspend fun sendStartSleep(): SleepStartResponse {
+    suspend fun sendStartSleep(): SleepCommResponse {
         return SleepSessionAPI.requestSleepStart()
     }
 
-    suspend fun sendEndSleep(): SleepEndResponse {
+    suspend fun sendEndSleep(): SleepResultResponse {
         return SleepSessionAPI.requestSleepEnd()
     }
 
-    fun sendProtocol06(context: Context? = null) {
+    suspend fun sendProtocol06(context: Context? = null): SleepCommResponse? {
         val protocol6Bytes = SleepProtocol06API.flush(context)
         if (protocol6Bytes.isNotEmpty()) {
-            CoroutineScope(Dispatchers.IO).launch {
-                try {
-                    val response: BaseResponse =
-                        SleepProtocol06API.requestPost(
-                            DateUtil.getCurrentDateTime(),
-                            protocol6Bytes
-                        )
-                    when (response.retCd) {
-                        "0" -> {
-                            Log.d(TAG, "Protocol06 전송 성공")
-                        }
-
-                        else -> {
-
-                        }
-                    }
-                } catch (e: Exception) {
-                    Log.e(TAG, "통신에 실패했습니다. ${e.message}")
-                }
-            }
+            val response: SleepCommResponse =
+                SleepProtocol06API.requestPost(
+                    DateUtil.getCurrentDateTime(),
+                    protocol6Bytes
+                )
+            return response
+        } else {
+            return null
         }
     }
 
@@ -85,7 +72,7 @@ class SleepApiService {
         if (protocol8Bytes.isNotEmpty()) {
             CoroutineScope(Dispatchers.IO).launch {
                 try {
-                    val response: Sleep06Response =
+                    val response: SleepCommResponse =
                         SleepProtocol08API.requestPost(
                             DateUtil.getCurrentDateTime(),
                             protocol8Bytes
@@ -109,7 +96,7 @@ class SleepApiService {
     fun sendProtocol09(hrSpo2: HRSpO2) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                val response: Sleep06Response = SleepProtocol09API.requestPost(
+                val response: SleepCommResponse = SleepProtocol09API.requestPost(
                     DateUtil.getCurrentDateTime(),
                     hrSpo2
                 )

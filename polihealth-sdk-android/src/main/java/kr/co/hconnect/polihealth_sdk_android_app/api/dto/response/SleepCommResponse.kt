@@ -3,7 +3,7 @@ package kr.co.hconnect.polihealth_sdk_android_app.api.dto.response
 import org.json.JSONException
 import org.json.JSONObject
 
-data class SleepStartResponse(
+data class SleepCommResponse(
     val data: Data?
 ) : BaseResponse() {
     data class Data(
@@ -12,7 +12,7 @@ data class SleepStartResponse(
 }
 
 
-fun String.toSleepStartResponse(): SleepStartResponse {
+fun String.toSleepCommResponse(): SleepCommResponse {
     val jsonObject = JSONObject(this)
 
     val retCd = jsonObject.optString("retCd")
@@ -23,20 +23,20 @@ fun String.toSleepStartResponse(): SleepStartResponse {
         val dataObject: JSONObject? = jsonObject.getJSONObject("data")
         dataObject?.let {
             val sessionId = it.getString("sessionId")
-            val data = SleepStartResponse.Data(sessionId = sessionId)
-            return SleepStartResponse(data).apply {
+            val data = SleepCommResponse.Data(sessionId = sessionId)
+            return SleepCommResponse(data).apply {
                 this.retCd = retCd
                 this.retMsg = retMsg
                 this.resDate = resDate
             }
         }
-            ?: return SleepStartResponse(null).apply {
+            ?: return SleepCommResponse(null).apply {
                 this.retCd = retCd
                 this.retMsg = retMsg
                 this.resDate = resDate
             }
     } catch (e: JSONException) {
-        return SleepStartResponse(null).apply {
+        return SleepCommResponse(null).apply {
             this.retCd = retCd
             this.retMsg = retMsg
             this.resDate = resDate

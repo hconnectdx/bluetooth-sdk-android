@@ -22,22 +22,16 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kr.co.hconnect.permissionlib.PermissionManager
 import kr.co.hconnect.polihealth_sdk_android_app.Permissions
 import kr.co.hconnect.polihealth_sdk_android_app.PoliBLE
-import kr.co.hconnect.polihealth_sdk_android_app.api.sleep.SleepProtocol06API
-import kr.co.hconnect.polihealth_sdk_android_app.api.SleepRepository
 import kr.co.hconnect.polihealth_sdk_android_app.api.dto.request.HRSpO2
-import kr.co.hconnect.polihealth_sdk_android_app.api.dto.response.SleepEndResponse
 import kr.co.hconnect.polihealth_sdk_android_app.api.sleep.SleepProtocol07API
 import kr.co.hconnect.polihealth_sdk_android_app.api.sleep.SleepProtocol08API
 import kr.co.hconnect.polihealth_sdk_android_app.api.sleep.SleepProtocol09API
-import kr.co.hconnect.polihealth_sdk_android_app.api.sleep.SleepSessionAPI
 import kr.co.hconnect.polihealth_sdk_android_app.service.sleep.SleepApiService
 import kr.co.hconnect.polihealth_sdk_android_app.view.home.compose.BLEScanButton
 import kr.co.hconnect.polihealth_sdk_android_app.view.home.compose.BondedList
@@ -130,7 +124,24 @@ fun HomeScreen(
                         }
                     }
                     Row {
-                        Button(onClick = { SleepProtocol06API.testPost(context = context) }) {
+                        Button(onClick = {
+                            CoroutineScope(Dispatchers.Main).launch {
+                                val response = withContext(Dispatchers.IO) {
+                                    SleepApiService().sendProtocol06()
+                                }
+
+                                if (response == null) {
+                                    Log.e(
+                                        "HomeScreen",
+                                        "Protocol06: response: $response 전송할 데이터가 없습니다."
+                                    )
+                                } else {
+                                    Log.d("HomeScreen", "Protocol06 전송 성공 response: $response")
+                                }
+                            }
+
+
+                        }) {
                             Text(text = "Test6")
                         }
                         Button(onClick = { SleepProtocol07API.testPost(context = context) }) {
@@ -166,6 +177,7 @@ fun HomeScreen(
 }
 
 
+@RequiresApi(Build.VERSION_CODES.Q)
 @Composable
 @Preview(
     showBackground = true,

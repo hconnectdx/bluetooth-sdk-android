@@ -5,6 +5,9 @@ import android.bluetooth.BluetoothGattService
 import android.bluetooth.le.ScanResult
 import android.content.Context
 import android.util.Log
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kr.co.hconnect.bluetoothlib.HCBle
 import kr.co.hconnect.polihealth_sdk_android_app.api.dto.request.HRSpO2
 import kr.co.hconnect.polihealth_sdk_android_app.api.sleep.SleepProtocol06API
@@ -72,17 +75,16 @@ object PoliBLE {
                         }
 
                         0x08.toByte() -> {
-                            SleepApiService().sendProtocol06(context)
-                            SleepProtocol08API.addByte(removeFrontTwoBytes(it, 2))
+                            CoroutineScope(Dispatchers.IO).launch {
+                                SleepApiService().sendProtocol06(context)
+                                SleepProtocol08API.addByte(removeFrontTwoBytes(it, 2))
+                            }
                         }
 
                         0x09.toByte() -> {
                             val hrSpO2: HRSpO2 =
                                 HRSpO2Parser.asciiToHRSpO2(removeFrontTwoBytes(it, 1))
-
-//                            SleepProtocol09API.requestPost(
-//                                DateUtil.getCurrentDateTime(), hrSpO2
-//                            )
+//                            SleepApiService().send
                             Log.d("PoliBLE", "RepositoryProtocol09 를 전송하였습니다.")
                         }
                     }
