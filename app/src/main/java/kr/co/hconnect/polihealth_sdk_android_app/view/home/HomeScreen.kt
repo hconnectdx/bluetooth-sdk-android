@@ -22,18 +22,23 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kr.co.hconnect.permissionlib.PermissionManager
 import kr.co.hconnect.polihealth_sdk_android_app.Permissions
 import kr.co.hconnect.polihealth_sdk_android_app.PoliBLE
 import kr.co.hconnect.polihealth_sdk_android_app.api.sleep.SleepProtocol06API
 import kr.co.hconnect.polihealth_sdk_android_app.api.SleepRepository
 import kr.co.hconnect.polihealth_sdk_android_app.api.dto.request.HRSpO2
+import kr.co.hconnect.polihealth_sdk_android_app.api.dto.response.SleepEndResponse
 import kr.co.hconnect.polihealth_sdk_android_app.api.sleep.SleepProtocol07API
 import kr.co.hconnect.polihealth_sdk_android_app.api.sleep.SleepProtocol08API
 import kr.co.hconnect.polihealth_sdk_android_app.api.sleep.SleepProtocol09API
 import kr.co.hconnect.polihealth_sdk_android_app.api.sleep.SleepSessionAPI
+import kr.co.hconnect.polihealth_sdk_android_app.service.sleep.SleepApiService
 import kr.co.hconnect.polihealth_sdk_android_app.view.home.compose.BLEScanButton
 import kr.co.hconnect.polihealth_sdk_android_app.view.home.compose.BondedList
 import kr.co.hconnect.polihealth_sdk_android_app.view.home.compose.ScanList
@@ -86,14 +91,27 @@ fun HomeScreen(
                         Box(modifier = Modifier.width(10.dp))
                         BLEScanButton(scanViewModel = scanViewModel)
                         Button(onClick = {
-                            SleepSessionAPI.testSleepStart()
+                            SleepApiService().sendStartSleep()
 
                         }) {
                             Text(text = "Start Sleep")
                         }
 
                         Button(onClick = {
-                            SleepSessionAPI.testSleepEnd()
+                            CoroutineScope(Dispatchers.Main).launch {
+                                val response = withContext(Dispatchers.IO) {
+                                    SleepApiService().sendEndSleep()
+                                }
+
+                                if (response.retCd == "0") {
+                                    Log.d("HomeScreen", "수면 종료 요청 성공")
+                                } else {
+                                    Log.e(
+                                        "HomeScreen",
+                                        "retCd: ${response.retCd}\nretMsg: ${response.retMsg}\nretDate: ${response.resDate}"
+                                    )
+                                }
+                            }
 
                         }) {
                             Text(text = "End Sleep")

@@ -9,10 +9,7 @@ import kr.co.hconnect.polihealth_sdk_android_app.api.sleep.SleepSessionAPI
 class SleepRepository {
     suspend fun requestStartBand(): SleepStartResponse {
         val deferred = CoroutineScope(Dispatchers.IO).async {
-            SleepSessionAPI.requestSleepStart(
-                reqDate = "20240708074048",
-                userSno = 1
-            )
+            SleepSessionAPI.requestSleepStart()
         }
 
         return deferred.await()
