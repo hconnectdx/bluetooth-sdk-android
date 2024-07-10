@@ -127,7 +127,7 @@ fun HomeScreen(
                         Button(onClick = {
                             CoroutineScope(Dispatchers.Main).launch {
                                 val response = withContext(Dispatchers.IO) {
-                                    SleepApiService().sendProtocol06()
+                                    SleepApiService().sendProtocol06(context = context)
                                 }
 
                                 if (response == null) {
@@ -147,7 +147,23 @@ fun HomeScreen(
                         Button(onClick = { SleepProtocol07API.testPost(context = context) }) {
                             Text(text = "Test7")
                         }
-                        Button(onClick = { SleepProtocol08API.testPost(context = context) }) {
+                        Button(onClick = {
+                            CoroutineScope(Dispatchers.Main).launch {
+                                val response = withContext(Dispatchers.IO) {
+                                    SleepApiService().sendProtocol08(context = context)
+                                }
+
+                                if (response == null) {
+                                    Log.e(
+                                        "HomeScreen",
+                                        "Protocol08: response: $response 전송할 데이터가 없습니다."
+                                    )
+                                } else {
+                                    Log.d("HomeScreen", "Protocol08 전송 성공 response: $response")
+                                }
+                            }
+
+                        }) {
                             Text(text = "Test8")
                         }
                         Button(onClick = {

@@ -69,9 +69,10 @@ object PoliBLE {
                         }
 
                         0x07.toByte() -> {
-//                            SleepProtocol08API.flush(context)
-                            SleepApiService().sendProtocol08(context)
-                            SleepProtocol07API.addByte(removeFrontTwoBytes(it, 2))
+                            CoroutineScope(Dispatchers.IO).launch {
+                                SleepApiService().sendProtocol08(context)
+                                SleepProtocol07API.addByte(removeFrontTwoBytes(it, 2))
+                            }
                         }
 
                         0x08.toByte() -> {
