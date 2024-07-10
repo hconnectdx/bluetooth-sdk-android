@@ -5,12 +5,15 @@ import android.bluetooth.BluetoothGattService
 import android.bluetooth.le.ScanResult
 import android.content.Context
 import android.util.Log
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 import kr.co.hconnect.bluetoothlib.HCBle
-import kr.co.hconnect.polihealth_sdk_android_app.api.dto.request.HRSpO2
+import kr.co.hconnect.polihealth_sdk_android_app.api.dto.response.SleepResponse
 import kr.co.hconnect.polihealth_sdk_android_app.api.sleep.SleepProtocol06API
 import kr.co.hconnect.polihealth_sdk_android_app.api.sleep.SleepProtocol07API
 import kr.co.hconnect.polihealth_sdk_android_app.api.sleep.SleepProtocol08API
-import kr.co.hconnect.polihealth_sdk_android_app.api.sleep.SleepProtocol09API
 import kr.co.hconnect.polihealth_sdk_android_app.service.sleep.SleepApiService
 
 object PoliBLE {
@@ -36,7 +39,7 @@ object PoliBLE {
         onGattServiceState: (gatt: Int) -> Unit,
         onBondState: (bondState: Int) -> Unit,
         onSubscriptionState: (state: Boolean) -> Unit,
-        onReceive: (byteArray: ByteArray) -> Unit
+        onReceive: (type: ProtocolType, response: SleepResponse?) -> Unit
     ) {
         HCBle.connectToDevice(
             device = device,
@@ -57,8 +60,11 @@ object PoliBLE {
 
                     when (it[0]) {
                         0x04.toByte() -> {
-                            Log.d("PoliBLE", "RepositoryProtocol04 를 전송하였습니다.")
-                            onReceive.invoke(it)
+                            onReceive.invoke(ProtocolType.PROTOCOL_4_SLEEP_START, null)
+                        }
+
+                        0x05.toByte() -> {
+                            onReceive.invoke(ProtocolType.PROTOCOL_5_SLEEP_END, null)
                         }
 
                         0x06.toByte() -> {
@@ -66,31 +72,61 @@ object PoliBLE {
                         }
 
                         0x07.toByte() -> {
-//                            SleepProtocol08API.flush(context)
-                            SleepApiService().sendProtocol08(context)
-                            SleepProtocol07API.addByte(removeFrontTwoBytes(it, 2))
+                            CoroutineScope(Dispatchers.IO).launch {
+                                val response: SleepResponse.SleepCommResponse? =
+                                    SleepApiService().sendProtocol08(context)
+                                response?.let {
+                                    onReceive.invoke(
+                                        ProtocolType.PROTOCOL_8,
+                                        response
+                                    )
+                                }
+
+                                SleepProtocol07API.addByte(removeFrontTwoBytes(it, 2))
+                            }
                         }
 
                         0x08.toByte() -> {
-                            SleepApiService().sendProtocol06(context)
-                            SleepProtocol08API.addByte(removeFrontTwoBytes(it, 2))
+                            CoroutineScope(Dispatchers.IO).launch {
+                                val response = SleepApiService().sendProtocol06(context)
+                                response?.let {
+                                    onReceive.invoke(
+                                        ProtocolType.PROTOCOL_6,
+                                        response
+                                    )
+                                }
+                                
+                                SleepProtocol08API.addByte(removeFrontTwoBytes(it, 2))
+                            }
                         }
 
                         0x09.toByte() -> {
-                            val hrSpO2: HRSpO2 =
-                                HRSpO2Parser.asciiToHRSpO2(removeFrontTwoBytes(it, 1))
+                            CoroutineScope(Dispatchers.IO).launch {
+                                val deferProtocol07 = async {
+                                    SleepApiService().sendProtocol07(context)
+                                }
 
-//                            SleepProtocol09API.requestPost(
-//                                DateUtil.getCurrentDateTime(), hrSpO2
-//                            )
-                            Log.d("PoliBLE", "RepositoryProtocol09 를 전송하였습니다.")
+                                val deferProtocol08 = async {
+                                    SleepApiService().sendProtocol08(context)
+                                }
+
+                                val responseProtocol07 = deferProtocol07.await()
+                                onReceive.invoke(ProtocolType.PROTOCOL_7, responseProtocol07)
+                                val responseProtocol08 = deferProtocol08.await()
+                                onReceive.invoke(ProtocolType.PROTOCOL_8, responseProtocol08)
+                            }
+                        }
+
+                        else -> {
+                            Log.e(TAG, "Unknown Protocol")
                         }
                     }
-
-                    onReceive.invoke(it)
                 } ?: run {
                     Log.e("PoliBLE", "byteArray is null")
                 }
+                val hexString =
+                    byteArray?.joinToString(separator = " ") { byte -> "%02x".format(byte) }
+                Log.d("GATTService", "onCharacteristicChanged: $hexString")
             }
         )
     }
