@@ -165,21 +165,61 @@ private fun connect(
                 Log.d("GATTService", "onSubscriptionState: $state")
                 deviceViewModel.isSubscribed.value = state
             },
-            onReceive = { byteArray ->
-                when (byteArray[0]) {
-                    ProtocolType.SLEEP_START -> {
+            onReceive = { type, response ->
+                when (type) {
+                    ProtocolType.PROTOCOL_4_SLEEP_START -> {
                         Log.d("GATTService", "Sleep Start!")
+                        Log.d("GATTService", response?.toString() ?: "null")
                     }
 
-                    ProtocolType.SLEEP_END -> {
+                    ProtocolType.PROTOCOL_5_SLEEP_END -> {
                         Log.d("GATTService", "Sleep End!")
+                        Log.d("GATTService", response?.toString() ?: "null")
                     }
+
+                    ProtocolType.PROTOCOL_6 -> {
+                        Log.d("GATTService", "Protocol 6")
+                        Log.d("GATTService", response?.toString() ?: "null")
+                    }
+
+                    ProtocolType.PROTOCOL_7 -> {
+                        Log.d("GATTService", "Protocol 7")
+                        Log.d("GATTService", response?.toString() ?: "null")
+                    }
+
+                    ProtocolType.PROTOCOL_8 -> {
+                        Log.d("GATTService", "Protocol 8")
+                        Log.d("GATTService", response?.toString() ?: "null")
+                    }
+
+                    ProtocolType.PROTOCOL_9_HR_SpO2 -> {
+                        Log.d("GATTService", "Protocol 9")
+                        Log.d("GATTService", response?.toString() ?: "null")
+                    }
+
+                    else -> {
+                        Log.d("GATTService", "Unknown Protocol")
+                        Log.d("GATTService", response?.toString() ?: "null")
+                    }
+
+
                 }
-                val hexString =
-                    byteArray.joinToString(separator = " ") { byte -> "%02x".format(byte) }
-                Log.d("GATTService", "onCharacteristicChanged: $hexString")
-            },
+            }
         )
+//        { (type, response) ->
+////                when (byteArray[0]) {
+////                    ProtocolType.SLEEP_START -> {
+////                        Log.d("GATTService", "Sleep Start!")
+////                    }
+////
+////                    ProtocolType.SLEEP_END -> {
+////                        Log.d("GATTService", "Sleep End!")
+////                    }
+////                }
+////                val hexString =
+////                    byteArray.joinToString(separator = " ") { byte -> "%02x".format(byte) }
+////                Log.d("GATTService", "onCharacteristicChanged: $hexString")
+//        }
     } ?: {
         Log.e("GATTService", "Device is null")
     }

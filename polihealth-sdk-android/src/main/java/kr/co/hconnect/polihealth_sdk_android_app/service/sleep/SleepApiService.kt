@@ -7,9 +7,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kr.co.hconnect.polihealth_sdk_android_app.DateUtil
 import kr.co.hconnect.polihealth_sdk_android_app.api.dto.request.HRSpO2
-import kr.co.hconnect.polihealth_sdk_android_app.api.dto.response.BaseResponse
-import kr.co.hconnect.polihealth_sdk_android_app.api.dto.response.SleepResultResponse
-import kr.co.hconnect.polihealth_sdk_android_app.api.dto.response.SleepCommResponse
+import kr.co.hconnect.polihealth_sdk_android_app.api.dto.response.SleepResponse
 import kr.co.hconnect.polihealth_sdk_android_app.api.sleep.SleepProtocol06API
 import kr.co.hconnect.polihealth_sdk_android_app.api.sleep.SleepProtocol07API
 import kr.co.hconnect.polihealth_sdk_android_app.api.sleep.SleepProtocol08API
@@ -19,11 +17,11 @@ import kr.co.hconnect.polihealth_sdk_android_app.api.sleep.SleepSessionAPI
 class SleepApiService {
     private val TAG = "SleepApiService"
 
-    suspend fun sendStartSleep(): SleepCommResponse {
+    suspend fun sendStartSleep(): SleepResponse.SleepCommResponse {
         return SleepSessionAPI.requestSleepStart()
     }
 
-    suspend fun sendEndSleep(): SleepResultResponse {
+    suspend fun sendEndSleep(): SleepResponse.SleepResultResponse {
         return SleepSessionAPI.requestSleepEnd()
     }
 
@@ -33,10 +31,10 @@ class SleepApiService {
      * @param context : 전송 시, bin 파일을 저장하기 위한 컨텍스트. null일 경우, bin 파일 저장 X
      * @return SleepCommResponse
      */
-    suspend fun sendProtocol06(context: Context? = null): SleepCommResponse? {
+    suspend fun sendProtocol06(context: Context? = null): SleepResponse.SleepCommResponse? {
         val protocol6Bytes = SleepProtocol06API.flush(context)
         if (protocol6Bytes.isNotEmpty()) {
-            val response: SleepCommResponse =
+            val response: SleepResponse.SleepCommResponse =
                 SleepProtocol06API.requestPost(
                     DateUtil.getCurrentDateTime(),
                     protocol6Bytes
@@ -51,30 +49,19 @@ class SleepApiService {
      * TODO: Protocol07 전송
      *
      * @param context : 전송 시, bin 파일을 저장하기 위한 컨텍스트. null일 경우, bin 파일 저장 X
+     * @return SleepCommResponse
      */
-    fun sendProtocol07(context: Context?) {
+    suspend fun sendProtocol07(context: Context?): SleepResponse.SleepCommResponse? {
         val protocol7Bytes = SleepProtocol07API.flush(context)
         if (protocol7Bytes.isNotEmpty()) {
-            CoroutineScope(Dispatchers.IO).launch {
-                try {
-                    val response: BaseResponse =
-                        SleepProtocol07API.requestPost(
-                            DateUtil.getCurrentDateTime(),
-                            protocol7Bytes
-                        )
-                    when (response.retCd) {
-                        "0" -> {
-                            Log.d(TAG, "Protocol07 전송 성공")
-                        }
-
-                        else -> {
-
-                        }
-                    }
-                } catch (e: Exception) {
-                    Log.e(TAG, "통신에 실패했습니다. ${e.message}")
-                }
-            }
+            val response: SleepResponse.SleepCommResponse =
+                SleepProtocol07API.requestPost(
+                    DateUtil.getCurrentDateTime(),
+                    protocol7Bytes
+                )
+            return response
+        } else {
+            return null
         }
     }
 
@@ -84,10 +71,10 @@ class SleepApiService {
      * @param context : 전송 시, bin 파일을 저장하기 위한 컨텍스트. null일 경우, bin 파일 저장 X
      * @return SleepCommResponse
      */
-    suspend fun sendProtocol08(context: Context? = null): SleepCommResponse? {
+    suspend fun sendProtocol08(context: Context? = null): SleepResponse.SleepCommResponse? {
         val protocol8Bytes = SleepProtocol08API.flush(context)
         if (protocol8Bytes.isNotEmpty()) {
-            val response: SleepCommResponse =
+            val response: SleepResponse.SleepCommResponse =
                 SleepProtocol08API.requestPost(
                     DateUtil.getCurrentDateTime(),
                     protocol8Bytes
@@ -101,7 +88,7 @@ class SleepApiService {
     fun sendProtocol09(hrSpo2: HRSpO2) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                val response: SleepCommResponse = SleepProtocol09API.requestPost(
+                val response: SleepResponse.SleepCommResponse = SleepProtocol09API.requestPost(
                     DateUtil.getCurrentDateTime(),
                     hrSpo2
                 )

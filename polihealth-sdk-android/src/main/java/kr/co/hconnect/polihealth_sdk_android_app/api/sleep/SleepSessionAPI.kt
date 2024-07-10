@@ -7,8 +7,7 @@ import kotlinx.coroutines.runBlocking
 import kr.co.hconnect.polihealth_sdk_android_app.DateUtil
 import kr.co.hconnect.polihealth_sdk_android_app.PoliClient
 import kr.co.hconnect.polihealth_sdk_android_app.api.dto.request.RequestBody
-import kr.co.hconnect.polihealth_sdk_android_app.api.dto.response.SleepResultResponse
-import kr.co.hconnect.polihealth_sdk_android_app.api.dto.response.SleepCommResponse
+import kr.co.hconnect.polihealth_sdk_android_app.api.dto.response.SleepResponse
 import kr.co.hconnect.polihealth_sdk_android_app.api.dto.response.toSleepEndResponse
 import kr.co.hconnect.polihealth_sdk_android_app.api.dto.response.toSleepCommResponse
 
@@ -21,12 +20,12 @@ object SleepSessionAPI {
      *
      * @return SleepStartResponse (sessionId)
      */
-    suspend fun requestSleepStart(): SleepCommResponse {
+    suspend fun requestSleepStart(): SleepResponse.SleepCommResponse {
         val requestBody = RequestBody(
             reqDate = DateUtil.getCurrentDateTime(),
             userSno = userSno
         )
-        val response: SleepCommResponse =
+        val response: SleepResponse.SleepCommResponse =
             PoliClient.client.post("/poli/sleep/start") { setBody(requestBody) }
                 .call.attributes[AttributeKey("body")].toString()
                 .toSleepCommResponse()
@@ -45,14 +44,14 @@ object SleepSessionAPI {
      *
      * @return SleepEndResponse (sleepQuality)
      */
-    suspend fun requestSleepEnd(): SleepResultResponse {
+    suspend fun requestSleepEnd(): SleepResponse.SleepResultResponse {
         val requestBody = RequestBody(
             reqDate = DateUtil.getCurrentDateTime(),
             userSno = userSno,
             sessionId = sessionId
         )
 
-        val response: SleepResultResponse =
+        val response: SleepResponse.SleepResultResponse =
             PoliClient.client.post("/poli/sleep/stop") { setBody(requestBody) }
                 .call.attributes[AttributeKey("body")].toString()
                 .toSleepEndResponse()

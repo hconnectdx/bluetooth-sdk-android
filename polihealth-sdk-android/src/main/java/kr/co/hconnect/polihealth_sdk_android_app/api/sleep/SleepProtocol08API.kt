@@ -15,7 +15,7 @@ import io.ktor.util.InternalAPI
 import kotlinx.coroutines.runBlocking
 import kr.co.hconnect.polihealth_sdk_android_app.PoliClient
 import kr.co.hconnect.polihealth_sdk_android_app.api.BaseProtocolHandler
-import kr.co.hconnect.polihealth_sdk_android_app.api.dto.response.SleepCommResponse
+import kr.co.hconnect.polihealth_sdk_android_app.api.dto.response.SleepResponse
 import kr.co.hconnect.polihealth_sdk_android_app.api.dto.response.toSleepCommResponse
 
 object SleepProtocol08API : BaseProtocolHandler() {
@@ -29,8 +29,8 @@ object SleepProtocol08API : BaseProtocolHandler() {
     suspend fun requestPost(
         reqDate: String,
         byteArray: ByteArray
-    ): SleepCommResponse {
-        val response: SleepCommResponse =
+    ): SleepResponse.SleepCommResponse {
+        val response: SleepResponse.SleepCommResponse =
             PoliClient.client.post("poli/sleep/protocol8") {
                 body = MultiPartFormDataContent(
                     formData {

@@ -12,7 +12,7 @@ import kotlinx.coroutines.runBlocking
 import kr.co.hconnect.polihealth_sdk_android_app.PoliClient
 import kr.co.hconnect.polihealth_sdk_android_app.api.dto.request.HRSpO2
 import kr.co.hconnect.polihealth_sdk_android_app.api.dto.request.HRSpO2Request
-import kr.co.hconnect.polihealth_sdk_android_app.api.dto.response.SleepCommResponse
+import kr.co.hconnect.polihealth_sdk_android_app.api.dto.response.SleepResponse
 import kr.co.hconnect.polihealth_sdk_android_app.api.dto.response.toSleepCommResponse
 
 object SleepProtocol09API {
@@ -26,8 +26,8 @@ object SleepProtocol09API {
     suspend fun requestPost(
         reqDate: String,
         hrSpO2: HRSpO2
-    ): SleepCommResponse {
-        val response: SleepCommResponse =
+    ): SleepResponse.SleepCommResponse {
+        val response: SleepResponse.SleepCommResponse =
             PoliClient.client.post("poli/sleep/protocol9") {
                 body = MultiPartFormDataContent(
                     formData {
