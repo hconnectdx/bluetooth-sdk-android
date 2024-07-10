@@ -27,6 +27,12 @@ class SleepApiService {
         return SleepSessionAPI.requestSleepEnd()
     }
 
+    /**
+     * TODO: Protocol06 전송
+     *
+     * @param context : 전송 시, bin 파일을 저장하기 위한 컨텍스트. null일 경우, bin 파일 저장 X
+     * @return SleepCommResponse
+     */
     suspend fun sendProtocol06(context: Context? = null): SleepCommResponse? {
         val protocol6Bytes = SleepProtocol06API.flush(context)
         if (protocol6Bytes.isNotEmpty()) {
@@ -41,6 +47,11 @@ class SleepApiService {
         }
     }
 
+    /**
+     * TODO: Protocol07 전송
+     *
+     * @param context : 전송 시, bin 파일을 저장하기 위한 컨텍스트. null일 경우, bin 파일 저장 X
+     */
     fun sendProtocol07(context: Context?) {
         val protocol7Bytes = SleepProtocol07API.flush(context)
         if (protocol7Bytes.isNotEmpty()) {
@@ -67,29 +78,23 @@ class SleepApiService {
         }
     }
 
-    fun sendProtocol08(context: Context? = null) {
+    /**
+     * TODO: Protocol08 전송
+     *
+     * @param context : 전송 시, bin 파일을 저장하기 위한 컨텍스트. null일 경우, bin 파일 저장 X
+     * @return SleepCommResponse
+     */
+    suspend fun sendProtocol08(context: Context? = null): SleepCommResponse? {
         val protocol8Bytes = SleepProtocol08API.flush(context)
         if (protocol8Bytes.isNotEmpty()) {
-            CoroutineScope(Dispatchers.IO).launch {
-                try {
-                    val response: SleepCommResponse =
-                        SleepProtocol08API.requestPost(
-                            DateUtil.getCurrentDateTime(),
-                            protocol8Bytes
-                        )
-                    when (response.retCd) {
-                        "0" -> {
-                            Log.d(TAG, "Protocol06 전송 성공")
-                        }
-
-                        else -> {
-
-                        }
-                    }
-                } catch (e: Exception) {
-                    Log.e(TAG, "통신에 실패했습니다. ${e.message}")
-                }
-            }
+            val response: SleepCommResponse =
+                SleepProtocol08API.requestPost(
+                    DateUtil.getCurrentDateTime(),
+                    protocol8Bytes
+                )
+            return response
+        } else {
+            return null
         }
     }
 
