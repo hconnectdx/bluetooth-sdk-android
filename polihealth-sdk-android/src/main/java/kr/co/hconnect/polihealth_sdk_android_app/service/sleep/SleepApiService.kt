@@ -20,19 +20,8 @@ import kr.co.hconnect.polihealth_sdk_android_app.api.sleep.SleepSessionAPI
 class SleepApiService {
     private val TAG = "SleepApiService"
 
-    fun sendStartSleep() {
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                val response: SleepStartResponse = SleepSessionAPI.requestSleepStart()
-                if (response.retCd == "0") {
-                    Log.d(TAG, "수면 시작 요청 성공")
-                } else {
-                    Log.e(TAG, "수면 시작 요청 실패")
-                }
-            } catch (e: Exception) {
-                Log.e(TAG, "통신에 실패했습니다. ${e.message}")
-            }
-        }
+    suspend fun sendStartSleep(): SleepStartResponse {
+        return SleepSessionAPI.requestSleepStart()
     }
 
     suspend fun sendEndSleep(): SleepEndResponse {

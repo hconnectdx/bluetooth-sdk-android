@@ -91,8 +91,20 @@ fun HomeScreen(
                         Box(modifier = Modifier.width(10.dp))
                         BLEScanButton(scanViewModel = scanViewModel)
                         Button(onClick = {
-                            SleepApiService().sendStartSleep()
+                            CoroutineScope(Dispatchers.Main).launch {
+                                val response = withContext(Dispatchers.IO) {
+                                    SleepApiService().sendStartSleep()
+                                }
 
+                                if (response.retCd == "0") {
+                                    Log.d("HomeScreen", "수면 시작 요청 성공 response: $response")
+                                } else {
+                                    Log.e(
+                                        "HomeScreen",
+                                        "수면시작 실패! retCd: ${response.retCd}\nretMsg: ${response.retMsg}\nretDate: ${response.resDate}"
+                                    )
+                                }
+                            }
                         }) {
                             Text(text = "Start Sleep")
                         }
@@ -104,11 +116,11 @@ fun HomeScreen(
                                 }
 
                                 if (response.retCd == "0") {
-                                    Log.d("HomeScreen", "수면 종료 요청 성공")
+                                    Log.d("HomeScreen", "수면 종료 요청 성공 response: $response")
                                 } else {
                                     Log.e(
                                         "HomeScreen",
-                                        "retCd: ${response.retCd}\nretMsg: ${response.retMsg}\nretDate: ${response.resDate}"
+                                        "수면종료 실패! retCd: ${response.retCd}\nretMsg: ${response.retMsg}\nretDate: ${response.resDate}"
                                     )
                                 }
                             }
