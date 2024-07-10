@@ -4,6 +4,8 @@ import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
 import io.ktor.util.AttributeKey
+import kotlinx.coroutines.runBlocking
+import kr.co.hconnect.polihealth_sdk_android_app.DateUtil
 import kr.co.hconnect.polihealth_sdk_android_app.PoliClient
 import kr.co.hconnect.polihealth_sdk_android_app.api.dto.request.RequestBody
 import kr.co.hconnect.polihealth_sdk_android_app.api.dto.response.SleepStartResponse
@@ -33,6 +35,13 @@ object SleepSessionAPI {
         return response
     }
 
+    fun testSleepStart() = runBlocking {
+        requestSleepStart(
+            reqDate = DateUtil.getCurrentDateTime(),
+            userSno = userSno
+        )
+    }
+
     suspend fun requestSleepEnd(
         reqDate: String,
         userSno: Int,
@@ -51,5 +60,13 @@ object SleepSessionAPI {
         } catch (e: Exception) {
             e.printStackTrace()
         }
+    }
+
+    fun testSleepEnd() = runBlocking {
+        requestSleepEnd(
+            reqDate = "20240704054513",
+            userSno = userSno,
+            sessionId = sessionId
+        )
     }
 }

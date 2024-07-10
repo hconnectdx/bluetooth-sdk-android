@@ -33,6 +33,7 @@ import kr.co.hconnect.polihealth_sdk_android_app.api.dto.request.HRSpO2
 import kr.co.hconnect.polihealth_sdk_android_app.api.sleep.SleepProtocol07API
 import kr.co.hconnect.polihealth_sdk_android_app.api.sleep.SleepProtocol08API
 import kr.co.hconnect.polihealth_sdk_android_app.api.sleep.SleepProtocol09API
+import kr.co.hconnect.polihealth_sdk_android_app.api.sleep.SleepSessionAPI
 import kr.co.hconnect.polihealth_sdk_android_app.view.home.compose.BLEScanButton
 import kr.co.hconnect.polihealth_sdk_android_app.view.home.compose.BondedList
 import kr.co.hconnect.polihealth_sdk_android_app.view.home.compose.ScanList
@@ -85,22 +86,18 @@ fun HomeScreen(
                         Box(modifier = Modifier.width(10.dp))
                         BLEScanButton(scanViewModel = scanViewModel)
                         Button(onClick = {
-                            CoroutineScope(Dispatchers.IO).launch {
-                                val a = SleepRepository().requestStartBand()
-                                Log.d("HomeScreen", a.retCd!!)
-                                Log.d("HomeScreen", a.resDate!!)
-                                Log.d("HomeScreen", a.retMsg!!)
-                                a.data?.sessionId?.let { Log.d("HomeScreen", it) }
-                                Log.d("HomeScreen", a.toString())
-                            }
+                            SleepSessionAPI.testSleepStart()
 
                         }) {
-                            Text(text = "Start Band")
+                            Text(text = "Start Sleep")
                         }
 
-                        //                    Button(onClick = { SleepProtocol09API.testPost(context = context) }) {
-                        //                        Text(text = "Test Protocol9")
-                        //                    }
+                        Button(onClick = {
+                            SleepSessionAPI.testSleepEnd()
+
+                        }) {
+                            Text(text = "End Sleep")
+                        }
                     }
                     Row {
                         Button(onClick = { SleepProtocol06API.testPost(context = context) }) {
