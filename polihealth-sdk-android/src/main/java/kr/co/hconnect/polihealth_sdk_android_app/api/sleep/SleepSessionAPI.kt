@@ -1,5 +1,6 @@
 package kr.co.hconnect.polihealth_sdk_android_app.api.sleep
 
+import android.util.Log
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
@@ -13,7 +14,7 @@ import kr.co.hconnect.polihealth_sdk_android_app.api.dto.response.toSleepStartRe
 
 object SleepSessionAPI {
     var sessionId: String = ""
-    var userSno: Int = 10
+    var userSno: Int = 5
 
     suspend fun requestSleepStart(
         reqDate: String,
@@ -28,9 +29,10 @@ object SleepSessionAPI {
                 .call.attributes[AttributeKey("body")].toString()
                 .toSleepStartResponse()
 
-        response.data?.let {
-            sessionId = it.sessionId
-        } ?: run { sessionId = "" }
+        sessionId = response.data?.sessionId ?: ""
+        Log.d("SleepSessionAPI", "userSno: $userSno")
+        Log.d("SleepSessionAPI", "sessionId: $sessionId")
+
 
         return response
     }

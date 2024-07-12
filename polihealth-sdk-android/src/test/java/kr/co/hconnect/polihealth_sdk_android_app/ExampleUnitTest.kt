@@ -1,17 +1,10 @@
 package kr.co.hconnect.polihealth_sdk_android_app
 
-import android.util.Log
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
-import kr.co.hconnect.polihealth_sdk_android_app.api.dto.request.HRSpO2
-import kr.co.hconnect.polihealth_sdk_android_app.api.dto.response.Sleep06Response
-import kr.co.hconnect.polihealth_sdk_android_app.api.sleep.SleepProtocol09API
 import org.junit.Test
 
 /**

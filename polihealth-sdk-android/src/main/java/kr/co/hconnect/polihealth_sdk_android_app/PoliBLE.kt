@@ -7,6 +7,7 @@ import android.content.Context
 import android.util.Log
 import kr.co.hconnect.bluetoothlib.HCBle
 import kr.co.hconnect.polihealth_sdk_android_app.api.dto.request.HRSpO2
+import kr.co.hconnect.polihealth_sdk_android_app.api.dto.response.SleepResponse
 import kr.co.hconnect.polihealth_sdk_android_app.api.sleep.SleepProtocol06API
 import kr.co.hconnect.polihealth_sdk_android_app.api.sleep.SleepProtocol07API
 import kr.co.hconnect.polihealth_sdk_android_app.api.sleep.SleepProtocol08API
@@ -72,18 +73,38 @@ object PoliBLE {
                         }
 
                         0x08.toByte() -> {
-                            SleepApiService().sendProtocol06(context)
-                            SleepProtocol08API.addByte(removeFrontTwoBytes(it, 2))
+                            CoroutineScope(Dispatchers.IO).launch {
+                                val response = SleepApiService().sendProtocol06(context)
+                                response?.let {
+                                    onReceive.invoke(
+                                        ProtocolType.PROTOCOL_6,
+                                        response
+                                    )
+                                }
+
+                                SleepProtocol08API.addByte(removeFrontTwoBytes(it, 2))
+                            }
                         }
 
                         0x09.toByte() -> {
                             val hrSpO2: HRSpO2 =
                                 HRSpO2Parser.asciiToHRSpO2(removeFrontTwoBytes(it, 1))
 
-//                            SleepProtocol09API.requestPost(
-//                                DateUtil.getCurrentDateTime(), hrSpO2
-//                            )
-                            Log.d("PoliBLE", "RepositoryProtocol09 를 전송하였습니다.")
+                                val hrSpO2: HRSpO2 =
+                                    HRSpO2Parser.asciiToHRSpO2(removeFrontTwoBytes(it, 1))
+                                val deferProtocol09 = async {
+                                    SleepApiService().sendProtocol09(hrSpO2)
+                                }
+
+                                val responseProtocol07 = deferProtocol07.await()
+                                onReceive.invoke(ProtocolType.PROTOCOL_7, responseProtocol07)
+
+                                val responseProtocol09 = deferProtocol09.await()
+                                onReceive.invoke(
+                                    ProtocolType.PROTOCOL_9_HR_SpO2,
+                                    responseProtocol09
+                                )
+                            }
                         }
                     }
 

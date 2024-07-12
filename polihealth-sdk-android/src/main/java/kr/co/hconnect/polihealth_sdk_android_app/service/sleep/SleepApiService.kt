@@ -66,25 +66,11 @@ class SleepApiService {
         }
     }
 
-    fun sendProtocol09(hrSpo2: HRSpO2) {
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                val response: Sleep06Response = SleepProtocol09API.requestPost(
-                    DateUtil.getCurrentDateTime(),
-                    hrSpo2
-                )
-                when (response.retCd) {
-                    "0" -> {
-                        Log.d(TAG, "Protocol09 전송 성공")
-                    }
-
-                    else -> {
-
-                    }
-                }
-            } catch (e: Exception) {
-                Log.e(TAG, "통신에 실패했습니다. ${e.message}")
-            }
-        }
+    suspend fun sendProtocol09(hrSpo2: HRSpO2): SleepResponse.SleepCommResponse {
+        val response: SleepResponse.SleepCommResponse = SleepProtocol09API.requestPost(
+            DateUtil.getCurrentDateTime(),
+            hrSpo2
+        )
+        return response
     }
 }

@@ -9,6 +9,7 @@ import io.ktor.client.request.setBody
 import io.ktor.util.AttributeKey
 import io.ktor.util.InternalAPI
 import kotlinx.coroutines.runBlocking
+import kr.co.hconnect.polihealth_sdk_android_app.DateUtil
 import kr.co.hconnect.polihealth_sdk_android_app.PoliClient
 import kr.co.hconnect.polihealth_sdk_android_app.api.dto.request.HRSpO2
 import kr.co.hconnect.polihealth_sdk_android_app.api.dto.request.HRSpO2Request
@@ -22,22 +23,24 @@ object SleepProtocol09API {
      * @param reqDate ex) 20240704054513 (yyyyMMddHHmmss)
      * @param hrspo2
      * */
-    @OptIn(InternalAPI::class)
     suspend fun requestPost(
         reqDate: String,
         hrSpO2: HRSpO2
-    ): Sleep06Response {
-        val response: Sleep06Response =
-            PoliClient.client.post("poli/sleep/protocol9") {
-                body = MultiPartFormDataContent(
-                    formData {
-                        append("reqDate", reqDate)
-                        append("userSno", SleepSessionAPI.userSno)
-                        append("sessionId", SleepSessionAPI.sessionId)
-                        append("data", hrSpO2)
-                    }
-                )
-            }.call.attributes[AttributeKey("body")].toString().toSleep06Response()
+    ): SleepResponse.SleepCommResponse {
+
+        val requestBody = HRSpO2Request(
+            reqDate = reqDate,
+            userSno = SleepSessionAPI.userSno,
+            sessionId = SleepSessionAPI.sessionId,
+            data = HRSpO2Request.Data(
+                oxygenVal = hrSpO2.spo2,
+                heartRateVal = hrSpO2.heartRate
+            )
+        )
+
+        val response = PoliClient.client.post("poli/sleep/protocol9") {
+            setBody(requestBody)
+        }.call.attributes[AttributeKey("body")].toString().toSleepCommResponse()
 
         return response
     }
