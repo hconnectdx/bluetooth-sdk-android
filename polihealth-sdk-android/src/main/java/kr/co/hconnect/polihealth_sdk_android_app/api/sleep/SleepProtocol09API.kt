@@ -13,8 +13,8 @@ import kr.co.hconnect.polihealth_sdk_android_app.DateUtil
 import kr.co.hconnect.polihealth_sdk_android_app.PoliClient
 import kr.co.hconnect.polihealth_sdk_android_app.api.dto.request.HRSpO2
 import kr.co.hconnect.polihealth_sdk_android_app.api.dto.request.HRSpO2Request
-import kr.co.hconnect.polihealth_sdk_android_app.api.dto.response.Sleep06Response
-import kr.co.hconnect.polihealth_sdk_android_app.api.dto.response.toSleep06Response
+import kr.co.hconnect.polihealth_sdk_android_app.api.dto.response.SleepResponse
+import kr.co.hconnect.polihealth_sdk_android_app.api.dto.response.toSleepCommResponse
 
 object SleepProtocol09API {
     /**
@@ -27,7 +27,7 @@ object SleepProtocol09API {
         reqDate: String,
         hrSpO2: HRSpO2
     ): SleepResponse.SleepCommResponse {
-
+      
         val requestBody = HRSpO2Request(
             reqDate = reqDate,
             userSno = SleepSessionAPI.userSno,
