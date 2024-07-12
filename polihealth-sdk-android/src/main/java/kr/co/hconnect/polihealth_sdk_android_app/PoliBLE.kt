@@ -10,6 +10,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kr.co.hconnect.bluetoothlib.HCBle
+import kr.co.hconnect.polihealth_sdk_android_app.api.dto.request.HRSpO2
 import kr.co.hconnect.polihealth_sdk_android_app.api.dto.response.SleepResponse
 import kr.co.hconnect.polihealth_sdk_android_app.api.sleep.SleepProtocol06API
 import kr.co.hconnect.polihealth_sdk_android_app.api.sleep.SleepProtocol07API
@@ -95,7 +96,6 @@ object PoliBLE {
                                         response
                                     )
                                 }
-                                
                                 SleepProtocol08API.addByte(removeFrontTwoBytes(it, 2))
                             }
                         }
@@ -105,18 +105,21 @@ object PoliBLE {
                                 val deferProtocol07 = async {
                                     SleepApiService().sendProtocol07(context)
                                 }
-
-                                val deferProtocol08 = async {
-                                    SleepApiService().sendProtocol08(context)
+                                val hrSpO2: HRSpO2 =
+                                    HRSpO2Parser.asciiToHRSpO2(removeFrontTwoBytes(it, 1))
+                                val deferProtocol09 = async {
+                                    SleepApiService().sendProtocol09(hrSpO2)
                                 }
 
                                 val responseProtocol07 = deferProtocol07.await()
                                 onReceive.invoke(ProtocolType.PROTOCOL_7, responseProtocol07)
-                                val responseProtocol08 = deferProtocol08.await()
-                                onReceive.invoke(ProtocolType.PROTOCOL_8, responseProtocol08)
-                            }
-                        }
 
+                                val responseProtocol09 = deferProtocol09.await()
+                                onReceive.invoke(
+                                    ProtocolType.PROTOCOL_9_HR_SpO2,
+                                    responseProtocol09
+                                )
+                            }
                         else -> {
                             Log.e(TAG, "Unknown Protocol")
                         }
