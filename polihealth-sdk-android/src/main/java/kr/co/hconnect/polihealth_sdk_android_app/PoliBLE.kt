@@ -56,8 +56,9 @@ object PoliBLE {
             onSubscriptionState = { state ->
                 onSubscriptionState.invoke(state)
             },
-            onCharacteristicChanged = { byteArray ->
-                byteArray?.let {
+            onReceive = { characteristic ->
+                val byteArray = characteristic.value ?: ByteArray(0)
+                byteArray.let {
 
                     when (it[0]) {
                         0x04.toByte() -> {
@@ -120,22 +121,23 @@ object PoliBLE {
                                     responseProtocol09
                                 )
                             }
+
+                        }
+
                         else -> {
                             Log.e(TAG, "Unknown Protocol")
                         }
                     }
-                } ?: run {
-                    Log.e("PoliBLE", "byteArray is null")
+                    val hexString =
+                        byteArray.joinToString(separator = " ") { byte -> "%02x".format(byte) }
+                    Log.d("GATTService", "onCharacteristicChanged: $hexString")
                 }
-                val hexString =
-                    byteArray?.joinToString(separator = " ") { byte -> "%02x".format(byte) }
-                Log.d("GATTService", "onCharacteristicChanged: $hexString")
             }
         )
     }
 
 
-    private fun removeFrontTwoBytes(byteArray: ByteArray, size: Int): ByteArray {
+    fun removeFrontTwoBytes(byteArray: ByteArray, size: Int): ByteArray {
         // 배열의 길이가 2 이상인 경우에만 앞의 2바이트를 제거
         if (byteArray.size > size) {
             return byteArray.copyOfRange(size, byteArray.size)
