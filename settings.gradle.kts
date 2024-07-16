@@ -16,6 +16,15 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+
+        maven {
+            url = uri("https://maven.pkg.github.com/yuheegyu/bluetooth-android-maven-repo")
+
+            credentials {
+                username = "yuheegyu"
+                password = "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"
+            }
+        }
     }
 }
 

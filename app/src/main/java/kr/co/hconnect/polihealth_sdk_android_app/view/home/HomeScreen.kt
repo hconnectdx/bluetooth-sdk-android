@@ -46,9 +46,9 @@ fun RequestPermissions(bondedDevicesViewModel: BondedDevicesViewModel = viewMode
     val permissions = Permissions.PERMISSION_SDK_31
 
     LaunchedEffect(Unit) {
-        if (PermissionManager.isGrantedPermissions(context, permissions)) {
-            bondedDevicesViewModel.bondedDevices.value = PoliBLE.getBondedDevices()
-        } else {
+//        if (PermissionManager.isGrantedPermissions(context, permissions)) {
+//            bondedDevicesViewModel.bondedDevices.value = PoliBLE.getBondedDevices()
+//        } else {
             // 권한이 부여되지 않은 경우 권한 요청
             PermissionManager.launchPermissions(permissions) { grantedPermissions ->
                 if (grantedPermissions.all { it.value }) {
@@ -57,7 +57,7 @@ fun RequestPermissions(bondedDevicesViewModel: BondedDevicesViewModel = viewMode
 
                 }
             }
-        }
+        //}
     }
 }
 

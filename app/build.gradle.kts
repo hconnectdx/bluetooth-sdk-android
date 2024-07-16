@@ -89,10 +89,11 @@ dependencies {
     implementation("androidx.navigation:navigation-compose:2.7.7")
     implementation("com.airbnb.android:lottie-compose:6.4.1")
 
-    implementation(files("/Users/gwagmin-u/Documents/0_workspace/aos/bluetoothlib_android/permissionlib/build/outputs/aar/permissionlib-release.aar"))
+    implementation("kr.co.hconnect:hconnect-permission-lib-android:0.0.1")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:$lifecycle_version")
 
-    implementation(project(":polihealth-sdk-android"))
+    //implementation(project(":polihealth-sdk-android"))
+    implementation("kr.co.hconnect:polihealth-sdk-android:0.0.1")
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
