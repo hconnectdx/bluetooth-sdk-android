@@ -83,7 +83,7 @@ object DailyProtocol01API {
         for (i in 0 until totalSamples) {
             val time = DateUtil.getCurrentDateTime()
 
-            // Parse METs data
+            // METs 데이터 추출 (2Bytes * 5EA)
             for (j in 0 until 5) {
                 val metsValue =
                     ((data[offset + 2 * j].toInt() shl 8) or (data[offset + 2 * j + 1].toInt() and 0xFF)).toShort()
@@ -91,17 +91,18 @@ object DailyProtocol01API {
                 metsList.add(LTMModel.Mets(time, metsValue))
             }
 
-            // Parse Temp data
+            // Temp 데이터 추출 (4Bytes)
             val tempValue =
                 ((data[offset + 10].toInt() shl 24) or (data[offset + 11].toInt() and 0xFF shl 16) or (data[offset + 12].toInt() and 0xFF shl 8) or (data[offset + 13].toInt() and 0xFF))
             skinTempList.add(LTMModel.SkinTemp(time, tempValue))
 
-            // Parse Lux data
+            // Lux 데이터 추출 (2Bytes)
             val luxValue =
                 ((data[offset + 14].toInt() shl 8) or (data[offset + 15].toInt() and 0xFF)).toShort()
                     .toInt()
             luxList.add(LTMModel.Lux(time, luxValue))
 
+            // 오프셋 증가
             offset += sampleSize
         }
 
