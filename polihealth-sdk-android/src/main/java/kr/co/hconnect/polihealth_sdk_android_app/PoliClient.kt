@@ -21,6 +21,13 @@ object PoliClient {
     private lateinit var _baseUrl: String
     val baseUrl: String get() = _baseUrl
 
+    private var _userAge: Int = 0
+    var userAge: Int
+        get() = _userAge
+        set(value) {
+            _userAge = value
+        }
+
     fun init(
         baseUrl: String,
         clientId: String,
