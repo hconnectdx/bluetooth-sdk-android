@@ -39,6 +39,7 @@ object DailyProtocol02API : BaseProtocolHandler() {
                     formData {
                         append("reqDate", reqDate)
                         append("userSno", SleepSessionAPI.userSno)
+                        append("userAge", PoliClient.userAge)
                         append("file", byteArray, Headers.build {
                             append(
                                 HttpHeaders.ContentDisposition,

@@ -46,6 +46,7 @@ class MainActivity : ComponentActivity() {
             clientId = BuildConfig.CLIENT_ID,
             clientSecret = BuildConfig.CLIENT_SECRET
         )
+        PoliClient.userAge = 25
     }
 }
 
