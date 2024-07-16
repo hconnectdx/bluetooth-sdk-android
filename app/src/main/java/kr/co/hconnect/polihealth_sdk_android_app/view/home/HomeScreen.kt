@@ -200,7 +200,8 @@ fun HomeScreen(
                 )
                 ScanList(
                     navController = navController,
-                    scanViewModel = scanViewModel
+                    scanViewModel = scanViewModel,
+                    deviceViewModel = deviceViewModel
                 )
             }
         }

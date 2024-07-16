@@ -13,20 +13,23 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import kr.co.hconnect.polihealth_sdk_android_app.PoliBLE
+import kr.co.hconnect.polihealth_sdk_android_app.viewmodel.DeviceViewModel
 import kr.co.hconnect.polihealth_sdk_android_app.viewmodel.ScanResultViewModel
 
 @SuppressLint("MissingPermission")
 @Composable
 fun ScanList(
     navController: NavController,
-    scanViewModel: ScanResultViewModel = viewModel()
+    scanViewModel: ScanResultViewModel = viewModel(),
+    deviceViewModel: DeviceViewModel = viewModel()
 ) {
     LazyColumn {
         items(scanViewModel.scanResults.size) { item ->
             Box(
                 Modifier.clickable {
                     PoliBLE.stopScan()
-                    scanViewModel.selDevice.value = scanViewModel.scanResults[item]
+//                    scanViewModel.selDevice.value = scanViewModel.scanResults[item]
+                    deviceViewModel.device.value = scanViewModel.scanResults[item].device
                     navController.navigate("deviceDetail")
                 }
             ) {

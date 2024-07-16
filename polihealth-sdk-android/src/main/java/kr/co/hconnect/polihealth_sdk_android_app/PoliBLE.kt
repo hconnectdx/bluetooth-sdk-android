@@ -125,7 +125,14 @@ object PoliBLE {
                         }
 
                         else -> {
-                            Log.e(TAG, "Unknown Protocol")
+                            Log.e(TAG, "Unknown Protocol: ${
+                                byteArray.joinToString(separator = " ") { byte ->
+                                    "%02x".format(
+                                        byte
+                                    )
+                                }
+                            }"
+                            )
                         }
                     }
                     val hexString =
