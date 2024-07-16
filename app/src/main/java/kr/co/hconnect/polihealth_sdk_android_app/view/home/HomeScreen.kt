@@ -28,10 +28,12 @@ import kotlinx.coroutines.withContext
 import kr.co.hconnect.permissionlib.PermissionManager
 import kr.co.hconnect.polihealth_sdk_android_app.Permissions
 import kr.co.hconnect.polihealth_sdk_android_app.PoliBLE
+import kr.co.hconnect.polihealth_sdk_android_app.api.daily.DailyProtocol01API
 import kr.co.hconnect.polihealth_sdk_android_app.api.dto.request.HRSpO2
 import kr.co.hconnect.polihealth_sdk_android_app.api.sleep.SleepProtocol07API
 import kr.co.hconnect.polihealth_sdk_android_app.api.sleep.SleepProtocol08API
 import kr.co.hconnect.polihealth_sdk_android_app.api.sleep.SleepProtocol09API
+import kr.co.hconnect.polihealth_sdk_android_app.service.sleep.DailyApiService
 import kr.co.hconnect.polihealth_sdk_android_app.service.sleep.SleepApiService
 import kr.co.hconnect.polihealth_sdk_android_app.view.home.compose.BLEScanButton
 import kr.co.hconnect.polihealth_sdk_android_app.view.home.compose.BondedList
@@ -127,7 +129,9 @@ fun HomeScreen(
                         Button(onClick = {
                             CoroutineScope(Dispatchers.Main).launch {
                                 val response = withContext(Dispatchers.IO) {
-//                                    SleepApiService().sendProtocol01(context = context)
+                                    val ltmModel =
+                                        DailyProtocol01API.parseLTMData(DailyProtocol01API.testRawData)
+                                    DailyApiService().sendProtocol01(ltmModel)
                                 }
 
                                 if (response == null) {
@@ -147,7 +151,7 @@ fun HomeScreen(
                         Button(onClick = {
                             CoroutineScope(Dispatchers.Main).launch {
                                 val response = withContext(Dispatchers.IO) {
-                                    SleepApiService().sendProtocol02(context = context)
+                                    DailyApiService().sendProtocol02(context = context)
                                 }
 
                                 if (response == null) {
@@ -165,7 +169,7 @@ fun HomeScreen(
                         Button(onClick = {
                             CoroutineScope(Dispatchers.Main).launch {
                                 val response = withContext(Dispatchers.IO) {
-                                    SleepApiService().sendProtocol03(
+                                    DailyApiService().sendProtocol03(
                                         HRSpO2(
                                             100,
                                             120
