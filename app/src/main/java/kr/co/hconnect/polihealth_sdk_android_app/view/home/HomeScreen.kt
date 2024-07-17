@@ -28,10 +28,12 @@ import kotlinx.coroutines.withContext
 import kr.co.hconnect.permissionlib.PermissionManager
 import kr.co.hconnect.polihealth_sdk_android_app.Permissions
 import kr.co.hconnect.polihealth_sdk_android_app.PoliBLE
+import kr.co.hconnect.polihealth_sdk_android_app.api.daily.DailyProtocol01API
 import kr.co.hconnect.polihealth_sdk_android_app.api.dto.request.HRSpO2
 import kr.co.hconnect.polihealth_sdk_android_app.api.sleep.SleepProtocol07API
 import kr.co.hconnect.polihealth_sdk_android_app.api.sleep.SleepProtocol08API
 import kr.co.hconnect.polihealth_sdk_android_app.api.sleep.SleepProtocol09API
+import kr.co.hconnect.polihealth_sdk_android_app.service.sleep.DailyApiService
 import kr.co.hconnect.polihealth_sdk_android_app.service.sleep.SleepApiService
 import kr.co.hconnect.polihealth_sdk_android_app.view.home.compose.BLEScanButton
 import kr.co.hconnect.polihealth_sdk_android_app.view.home.compose.BondedList
@@ -127,6 +129,72 @@ fun HomeScreen(
                         Button(onClick = {
                             CoroutineScope(Dispatchers.Main).launch {
                                 val response = withContext(Dispatchers.IO) {
+                                    val ltmModel =
+                                        DailyProtocol01API.parseLTMData(DailyProtocol01API.testRawData)
+                                    DailyApiService().sendProtocol01(ltmModel)
+                                }
+
+                                if (response == null) {
+                                    Log.e(
+                                        "HomeScreen",
+                                        "Protocol01: response: $response 전송할 데이터가 없습니다."
+                                    )
+                                } else {
+                                    Log.d("HomeScreen", "Protocol01 전송 성공 response: $response")
+                                }
+                            }
+
+
+                        }) {
+                            Text(text = "Test1")
+                        }
+                        Button(onClick = {
+                            CoroutineScope(Dispatchers.Main).launch {
+                                val response = withContext(Dispatchers.IO) {
+                                    DailyApiService().sendProtocol02(context = context)
+                                }
+
+                                if (response == null) {
+                                    Log.e(
+                                        "HomeScreen",
+                                        "Protocol02: response: $response 전송할 데이터가 없습니다."
+                                    )
+                                } else {
+                                    Log.d("HomeScreen", "Protocol02 전송 성공 response: $response")
+                                }
+                            }
+                        }) {
+                            Text(text = "Test2")
+                        }
+                        Button(onClick = {
+                            CoroutineScope(Dispatchers.Main).launch {
+                                val response = withContext(Dispatchers.IO) {
+                                    DailyApiService().sendProtocol03(
+                                        HRSpO2(
+                                            100,
+                                            120
+                                        )
+                                    )
+                                }
+
+                                if (response == null) {
+                                    Log.e(
+                                        "HomeScreen",
+                                        "Protocol03: response: $response 전송할 데이터가 없습니다."
+                                    )
+                                } else {
+                                    Log.d("HomeScreen", "Protocol03 전송 성공 response: $response")
+                                }
+                            }
+
+                        }) {
+                            Text(text = "Test3")
+                        }
+                    }
+                    Row {
+                        Button(onClick = {
+                            CoroutineScope(Dispatchers.Main).launch {
+                                val response = withContext(Dispatchers.IO) {
                                     SleepApiService().sendProtocol06(context = context)
                                 }
 
@@ -200,7 +268,8 @@ fun HomeScreen(
                 )
                 ScanList(
                     navController = navController,
-                    scanViewModel = scanViewModel
+                    scanViewModel = scanViewModel,
+                    deviceViewModel = deviceViewModel
                 )
             }
         }

@@ -1,13 +1,11 @@
 package kr.co.hconnect.polihealth_sdk_android_app.service.sleep
 
 import android.content.Context
-import android.util.Log
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kr.co.hconnect.polihealth_sdk_android_app.DateUtil
+import kr.co.hconnect.polihealth_sdk_android_app.api.daily.DailyProtocol03API
 import kr.co.hconnect.polihealth_sdk_android_app.api.dto.request.HRSpO2
 import kr.co.hconnect.polihealth_sdk_android_app.api.dto.response.SleepResponse
+import kr.co.hconnect.polihealth_sdk_android_app.api.sleep.DailyProtocol02API
 import kr.co.hconnect.polihealth_sdk_android_app.api.sleep.SleepProtocol06API
 import kr.co.hconnect.polihealth_sdk_android_app.api.sleep.SleepProtocol07API
 import kr.co.hconnect.polihealth_sdk_android_app.api.sleep.SleepProtocol08API
@@ -85,6 +83,12 @@ class SleepApiService {
         }
     }
 
+    /**
+     * TODO: Protocol09 전송
+     *
+     * @param hrSpo2
+     * @return SleepCommResponse
+     */
     suspend fun sendProtocol09(hrSpo2: HRSpO2): SleepResponse.SleepCommResponse {
         val response: SleepResponse.SleepCommResponse = SleepProtocol09API.requestPost(
             DateUtil.getCurrentDateTime(),

@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 data class HRSpO2Request(
     val reqDate: String,
     val userSno: Int,
-    val sessionId: String,
+    val sessionId: String? = null,
     val data: Data
 ) {
     @Serializable

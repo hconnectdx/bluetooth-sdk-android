@@ -10,11 +10,14 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kr.co.hconnect.bluetoothlib.HCBle
+import kr.co.hconnect.polihealth_sdk_android_app.api.daily.DailyProtocol01API
 import kr.co.hconnect.polihealth_sdk_android_app.api.dto.request.HRSpO2
 import kr.co.hconnect.polihealth_sdk_android_app.api.dto.response.SleepResponse
+import kr.co.hconnect.polihealth_sdk_android_app.api.sleep.DailyProtocol02API
 import kr.co.hconnect.polihealth_sdk_android_app.api.sleep.SleepProtocol06API
 import kr.co.hconnect.polihealth_sdk_android_app.api.sleep.SleepProtocol07API
 import kr.co.hconnect.polihealth_sdk_android_app.api.sleep.SleepProtocol08API
+import kr.co.hconnect.polihealth_sdk_android_app.service.sleep.DailyApiService
 import kr.co.hconnect.polihealth_sdk_android_app.service.sleep.SleepApiService
 
 object PoliBLE {
@@ -61,6 +64,45 @@ object PoliBLE {
                 byteArray.let {
 
                     when (it[0]) {
+                        0x01.toByte() -> {
+                            CoroutineScope(Dispatchers.IO).launch {
+                                val parsedData = DailyProtocol01API.parseLTMData(it)
+                                DailyProtocol01API.requestPost(
+                                    DateUtil.getCurrentDateTime(),
+                                    parsedData
+                                )
+                                onReceive.invoke(ProtocolType.PROTOCOL_2, null)
+                            }
+                        }
+
+                        0x02.toByte() -> {
+                            onReceive.invoke(ProtocolType.PROTOCOL_2, null)
+                            DailyProtocol02API.addByte(removeFrontTwoBytes(it, 2))
+                        }
+
+                        0x03.toByte() -> {
+                            CoroutineScope(Dispatchers.IO).launch {
+
+                                val deferProtocol02 = async {
+                                    DailyApiService().sendProtocol02(context)
+                                }
+                                val hrSpO2: HRSpO2 =
+                                    HRSpO2Parser.asciiToHRSpO2(removeFrontTwoBytes(it, 1))
+                                val deferProtocol03 = async {
+                                    DailyApiService().sendProtocol03(hrSpO2)
+                                }
+
+                                val responseProtocol02 = deferProtocol02.await()
+                                onReceive.invoke(ProtocolType.PROTOCOL_2, responseProtocol02)
+
+                                val responseProtocol03 = deferProtocol03.await()
+                                onReceive.invoke(
+                                    ProtocolType.PROTOCOL_3_HR_SpO2,
+                                    responseProtocol03
+                                )
+                            }
+                        }
+
                         0x04.toByte() -> {
                             onReceive.invoke(ProtocolType.PROTOCOL_4_SLEEP_START, null)
                         }
@@ -125,7 +167,14 @@ object PoliBLE {
                         }
 
                         else -> {
-                            Log.e(TAG, "Unknown Protocol")
+                            Log.e(TAG, "Unknown Protocol: ${
+                                byteArray.joinToString(separator = " ") { byte ->
+                                    "%02x".format(
+                                        byte
+                                    )
+                                }
+                            }"
+                            )
                         }
                     }
                     val hexString =

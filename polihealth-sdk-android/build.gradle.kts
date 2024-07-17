@@ -59,9 +59,12 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
-    implementation("kr.co.hconnect:hconnect-bluetooth-lib-android:0.0.1")
+//<<<<<<< feature/publish_githubpackages
+//    implementation("kr.co.hconnect:hconnect-bluetooth-lib-android:0.0.1")
+//=======
+    implementation(files("../../bluetoothlib_android/bluetoothlib/build/outputs/aar/bluetoothlib-release.aar"))
+//>>>>>>> develop
     implementation("io.ktor:ktor-client-core:$ktor_version")
-//    implementation("io.ktor:ktor-client-java:$ktor_version")
     implementation("io.ktor:ktor-client-cio:$ktor_version")
     implementation("io.ktor:ktor-client-content-negotiation:$ktor_version")
     implementation("io.ktor:ktor-serialization-kotlinx-json:$ktor_version")

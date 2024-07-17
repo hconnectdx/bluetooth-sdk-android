@@ -89,7 +89,11 @@ dependencies {
     implementation("androidx.navigation:navigation-compose:2.7.7")
     implementation("com.airbnb.android:lottie-compose:6.4.1")
 
-    implementation("kr.co.hconnect:hconnect-permission-lib-android:0.0.1")
+//<<<<<<< feature/publish_githubpackages
+//    implementation("kr.co.hconnect:hconnect-permission-lib-android:0.0.1")
+//=======
+    implementation(files("../../bluetoothlib_android/permissionlib/build/outputs/aar/permissionlib-release.aar"))
+//>>>>>>> develop
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:$lifecycle_version")
 
     //implementation(project(":polihealth-sdk-android"))
