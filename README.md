@@ -25,7 +25,7 @@ repositories {
         google()
         mavenCentral()
         maven {
-            url = uri("https://maven.pkg.github.com/hconnectdx/bluetooth-sdk-android-v2")
+            url = uri("https://maven.pkg.github.com/hconnectdx/bluetooth-sdk-android")
             credentials {
                 username = "hconnectdx"
                 password = "****" // 이메일로 문의를 주시면 토큰을 발급해드립니다.
