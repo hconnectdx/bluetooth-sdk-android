@@ -3,14 +3,17 @@ package kr.co.hconnect.polihealth_sdk_android_app.api.sleep
 import android.util.Log
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
+import io.ktor.http.ContentType
+import io.ktor.http.contentType
 import io.ktor.util.AttributeKey
 import kotlinx.coroutines.runBlocking
-import kr.co.hconnect.polihealth_sdk_android_app.DateUtil
-import kr.co.hconnect.polihealth_sdk_android_app.PoliClient
-import kr.co.hconnect.polihealth_sdk_android_app.api.dto.request.RequestBody
-import kr.co.hconnect.polihealth_sdk_android_app.api.dto.response.SleepResponse
-import kr.co.hconnect.polihealth_sdk_android_app.api.dto.response.toSleepEndResponse
-import kr.co.hconnect.polihealth_sdk_android_app.api.dto.response.toSleepCommResponse
+import kr.co.hconnect.polihealth_sdk_android.DateUtil
+import kr.co.hconnect.polihealth_sdk_android.PoliClient
+import kr.co.hconnect.polihealth_sdk_android.api.dto.request.RequestBody
+import kr.co.hconnect.polihealth_sdk_android.api.dto.response.SleepEndResponse
+import kr.co.hconnect.polihealth_sdk_android.api.dto.response.toSleepEndResponse
+import kr.co.hconnect.polihealth_sdk_android.api.dto.response.SleepResponse
+import kr.co.hconnect.polihealth_sdk_android.api.dto.response.toSleepResponse
 
 object SleepSessionAPI {
     var sessionId: String = ""
@@ -21,15 +24,19 @@ object SleepSessionAPI {
      *
      * @return SleepStartResponse (sessionId)
      */
-    suspend fun requestSleepStart(): SleepResponse.SleepCommResponse {
+    suspend fun requestSleepStart(): SleepResponse {
         val requestBody = RequestBody(
             reqDate = DateUtil.getCurrentDateTime(),
-            userSno = userSno
+            userSno = PoliClient.userSno,
         )
-        val response: SleepResponse.SleepCommResponse =
-            PoliClient.client.post("/poli/sleep/start") { setBody(requestBody) }
+        val response: SleepResponse =
+            PoliClient.client.post("/poli/sleep/start") {
+                contentType(ContentType.Application.Json)
+
+                setBody(requestBody)
+            }
                 .call.attributes[AttributeKey("body")].toString()
-                .toSleepCommResponse()
+                .toSleepResponse()
 
         sessionId = response.data?.sessionId ?: ""
         Log.d("SleepSessionAPI", "userSno: $userSno")
@@ -47,14 +54,14 @@ object SleepSessionAPI {
      *
      * @return SleepEndResponse (sleepQuality)
      */
-    suspend fun requestSleepEnd(): SleepResponse.SleepResultResponse {
+    suspend fun requestSleepEnd(): SleepEndResponse {
         val requestBody = RequestBody(
             reqDate = DateUtil.getCurrentDateTime(),
             userSno = userSno,
             sessionId = sessionId
         )
 
-        val response: SleepResponse.SleepResultResponse =
+        val response: SleepEndResponse =
             PoliClient.client.post("/poli/sleep/stop") { setBody(requestBody) }
                 .call.attributes[AttributeKey("body")].toString()
                 .toSleepEndResponse()

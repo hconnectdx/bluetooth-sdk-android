@@ -4,21 +4,26 @@ import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothGattService
 import android.bluetooth.le.ScanResult
 import android.content.Context
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
-import kr.co.hconnect.bluetoothlib.HCBle
-import kr.co.hconnect.polihealth_sdk_android_app.api.daily.DailyProtocol01API
-import kr.co.hconnect.polihealth_sdk_android_app.api.dto.request.HRSpO2
-import kr.co.hconnect.polihealth_sdk_android_app.api.dto.response.SleepResponse
+import kr.co.hconnect.bluetooth_sdk_android.HCBle
+import kr.co.hconnect.polihealth_sdk_android.api.daily.DailyProtocol01API
+import kr.co.hconnect.polihealth_sdk_android.api.dto.response.PoliResponse
+import kr.co.hconnect.polihealth_sdk_android.api.dto.response.SleepEndResponse
+import kr.co.hconnect.polihealth_sdk_android.api.sleep.SleepProtocol06API
+import kr.co.hconnect.polihealth_sdk_android.api.sleep.SleepProtocol07API
+import kr.co.hconnect.polihealth_sdk_android.api.sleep.SleepProtocol08API
+import kr.co.hconnect.polihealth_sdk_android.service.sleep.SleepApiService
 import kr.co.hconnect.polihealth_sdk_android_app.api.sleep.DailyProtocol02API
-import kr.co.hconnect.polihealth_sdk_android_app.api.sleep.SleepProtocol06API
-import kr.co.hconnect.polihealth_sdk_android_app.api.sleep.SleepProtocol07API
-import kr.co.hconnect.polihealth_sdk_android_app.api.sleep.SleepProtocol08API
-import kr.co.hconnect.polihealth_sdk_android_app.service.sleep.DailyApiService
-import kr.co.hconnect.polihealth_sdk_android_app.service.sleep.SleepApiService
+import kr.co.hconnect.polihealth_sdk_android.service.daily.DailyApiService
+import kr.co.hconnect.polihealth_sdk_android.api.daily.model.HRSpO2
+import kr.co.hconnect.polihealth_sdk_android.api.dto.response.Daily1Response
+import kr.co.hconnect.polihealth_sdk_android.api.dto.response.SleepResponse
 
 object PoliBLE {
     private const val TAG = "PoliBLE"
@@ -36,6 +41,10 @@ object PoliBLE {
         HCBle.scanStop()
     }
 
+    private var expectedByte: Byte = 0x00
+    private var protocol2Count = 0
+
+    @RequiresApi(Build.VERSION_CODES.Q)
     fun connectDevice(
         context: Context? = null, // bin파일 저장을 위한 임시 컨텍스트
         device: BluetoothDevice,
@@ -43,7 +52,7 @@ object PoliBLE {
         onGattServiceState: (gatt: Int) -> Unit,
         onBondState: (bondState: Int) -> Unit,
         onSubscriptionState: (state: Boolean) -> Unit,
-        onReceive: (type: ProtocolType, response: SleepResponse?) -> Unit
+        onReceive: (type: ProtocolType, response: PoliResponse?) -> Unit
     ) {
         HCBle.connectToDevice(
             device = device,
@@ -67,22 +76,23 @@ object PoliBLE {
                         0x01.toByte() -> {
                             CoroutineScope(Dispatchers.IO).launch {
                                 val parsedData = DailyProtocol01API.parseLTMData(it)
-                                DailyProtocol01API.requestPost(
+                                val response: Daily1Response = DailyProtocol01API.requestPost(
                                     DateUtil.getCurrentDateTime(),
                                     parsedData
                                 )
-                                onReceive.invoke(ProtocolType.PROTOCOL_2, null)
+                                onReceive.invoke(ProtocolType.PROTOCOL_1, response)
                             }
                         }
 
                         0x02.toByte() -> {
-                            onReceive.invoke(ProtocolType.PROTOCOL_2, null)
+                            checkProtocol2Validate(it[1])
                             DailyProtocol02API.addByte(removeFrontTwoBytes(it, 2))
                         }
 
                         0x03.toByte() -> {
                             CoroutineScope(Dispatchers.IO).launch {
-
+                                protocol2Count = 0
+                                expectedByte = 0x00
                                 val deferProtocol02 = async {
                                     DailyApiService().sendProtocol02(context)
                                 }
@@ -104,11 +114,17 @@ object PoliBLE {
                         }
 
                         0x04.toByte() -> {
-                            onReceive.invoke(ProtocolType.PROTOCOL_4_SLEEP_START, null)
+                            CoroutineScope(Dispatchers.IO).launch {
+                                val response: SleepResponse = SleepApiService().sendStartSleep()
+                                onReceive.invoke(ProtocolType.PROTOCOL_4_SLEEP_START, response)
+                            }
                         }
 
                         0x05.toByte() -> {
-                            onReceive.invoke(ProtocolType.PROTOCOL_5_SLEEP_END, null)
+                            CoroutineScope(Dispatchers.IO).launch {
+                                val response: SleepEndResponse = SleepApiService().sendEndSleep()
+                                onReceive.invoke(ProtocolType.PROTOCOL_5_SLEEP_END, response)
+                            }
                         }
 
                         0x06.toByte() -> {
@@ -117,7 +133,7 @@ object PoliBLE {
 
                         0x07.toByte() -> {
                             CoroutineScope(Dispatchers.IO).launch {
-                                val response: SleepResponse.SleepCommResponse? =
+                                val response: SleepResponse? =
                                     SleepApiService().sendProtocol08(context)
                                 response?.let {
                                     onReceive.invoke(
@@ -183,6 +199,23 @@ object PoliBLE {
                 }
             }
         )
+    }
+
+    private fun checkProtocol2Validate(it: Byte) {
+        if (it != expectedByte) {
+            Log.e(
+                "DataLogger",
+                "데이터 손실 감지: 예상 값 ${
+                    String.format(
+                        "0x%02X",
+                        expectedByte
+                    )
+                } 실제 값 ${String.format("0x%02X", it)}"
+            )
+        }
+        expectedByte =
+            if (it == 0xFF.toByte()) 0x00 else (it + 1).toByte()
+        Log.d("Protocol2 Count", "Count: ${++protocol2Count}")
     }
 
 

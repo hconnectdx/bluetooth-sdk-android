@@ -1,16 +1,18 @@
-package kr.co.hconnect.polihealth_sdk_android_app.api.dto.response
+package kr.co.hconnect.polihealth_sdk_android.api.dto.response
 
 import org.json.JSONException
 import org.json.JSONObject
 
-interface PoliResponse
-open class BaseResponse(
-    var retCd: String? = null,
-    var retMsg: String? = null,
-    var resDate: String? = null
-) : PoliResponse
+data class SleepEndResponse(
+    val data: Data? = null
+) : BaseResponse(), PoliResponse {
 
-fun String.toBaseResponse(): BaseResponse {
+    data class Data(
+        val sleepQuality: Int
+    )
+}
+
+fun String.toSleepEndResponse(): SleepEndResponse {
     val jsonObject = JSONObject(this)
 
     val retCd = jsonObject.optString("retCd")
@@ -20,19 +22,21 @@ fun String.toBaseResponse(): BaseResponse {
     try {
         val dataObject: JSONObject? = jsonObject.getJSONObject("data")
         dataObject?.let {
-            return BaseResponse().apply {
+            val sleepQuality = it.getInt("sleepQuality")
+            val data = SleepEndResponse.Data(sleepQuality = sleepQuality)
+            return SleepEndResponse(data).apply {
                 this.retCd = retCd
                 this.retMsg = retMsg
                 this.resDate = resDate
             }
         }
-            ?: return BaseResponse().apply {
+            ?: return SleepEndResponse(null).apply {
                 this.retCd = retCd
                 this.retMsg = retMsg
                 this.resDate = resDate
             }
     } catch (e: JSONException) {
-        return BaseResponse().apply {
+        return SleepEndResponse(null).apply {
             this.retCd = retCd
             this.retMsg = retMsg
             this.resDate = resDate

@@ -6,12 +6,11 @@ import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.util.AttributeKey
 import kotlinx.coroutines.runBlocking
-import kr.co.hconnect.polihealth_sdk_android_app.PoliClient
-import kr.co.hconnect.polihealth_sdk_android_app.api.dto.request.HRSpO2
-import kr.co.hconnect.polihealth_sdk_android_app.api.dto.request.HRSpO2Request
-import kr.co.hconnect.polihealth_sdk_android_app.api.dto.response.SleepResponse
-import kr.co.hconnect.polihealth_sdk_android_app.api.dto.response.toSleepCommResponse
-import kr.co.hconnect.polihealth_sdk_android_app.api.sleep.SleepSessionAPI
+import kr.co.hconnect.polihealth_sdk_android.PoliClient
+import kr.co.hconnect.polihealth_sdk_android.api.dto.request.HRSpO2Request
+import kr.co.hconnect.polihealth_sdk_android.api.daily.model.HRSpO2
+import kr.co.hconnect.polihealth_sdk_android.api.dto.response.Daily3Response
+import kr.co.hconnect.polihealth_sdk_android.api.dto.response.toDaily3Response
 
 object DailyProtocol03API {
     /**
@@ -23,7 +22,7 @@ object DailyProtocol03API {
     suspend fun requestPost(
         reqDate: String,
         hrSpO2: HRSpO2
-    ): SleepResponse.SleepCommResponse {
+    ): Daily3Response {
 
         val requestBody = HRSpO2Request(
             reqDate = reqDate,
@@ -36,7 +35,7 @@ object DailyProtocol03API {
 
         val response = PoliClient.client.post("poli/day/protocol3") {
             setBody(requestBody)
-        }.call.attributes[AttributeKey("body")].toString().toSleepCommResponse()
+        }.call.attributes[AttributeKey("body")].toString().toDaily3Response(hrSpO2)
 
         return response
     }

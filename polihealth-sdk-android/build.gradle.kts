@@ -42,7 +42,7 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
-    implementation(files("/Users/gwagmin-u/Documents/0_workspace/aos/bluetoothlib_android/bluetoothlib/build/outputs/aar/bluetoothlib-release.aar"))
+    implementation(project(":bluetooth-sdk-android"))
     implementation("io.ktor:ktor-client-core:$ktor_version")
 //    implementation("io.ktor:ktor-client-java:$ktor_version")
     implementation("io.ktor:ktor-client-cio:$ktor_version")

@@ -21,6 +21,7 @@ open class BaseProtocolHandler {
 
     // flush 함수: 데이터를 반환하고 _byteArray를 비움
 
+    @RequiresApi(Build.VERSION_CODES.Q)
     fun flush(context: Context?): ByteArray {
 
         if (_byteArray.isEmpty()) {
@@ -46,6 +47,7 @@ open class BaseProtocolHandler {
         joinToString(separator = " ") { byte -> "%02x".format(byte) }
 
     // flush 결과를 파일로 저장하는 함수
+    @RequiresApi(Build.VERSION_CODES.Q)
     private fun saveToFile(context: Context, data: ByteArray?, fileName: String) {
         data?.let {
             try {

@@ -8,26 +8,37 @@ import io.ktor.client.request.HttpSendPipeline
 import io.ktor.client.request.header
 import io.ktor.client.statement.HttpReceivePipeline
 import io.ktor.client.statement.bodyAsText
+import io.ktor.http.ContentType
 import io.ktor.http.content.OutgoingContent
+import io.ktor.http.encodedPath
+import io.ktor.serialization.kotlinx.KotlinxSerializationConverter
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.util.AttributeKey
 import io.ktor.util.toByteArray
 import kotlinx.serialization.json.Json
 
 object PoliClient {
-    private lateinit var _client: HttpClient
-    val client: HttpClient get() = _client
+    lateinit var client: HttpClient
+    private var baseUrl: String = ""
+    var userAge: Int = 0
+    var userSno: Int = 0
+    var sessionId: String = ""
 
-    private lateinit var _baseUrl: String
-    val baseUrl: String get() = _baseUrl
 
+    /**
+     * TODO PoliClient 초기화
+     *
+     * @param baseUrl
+     * @param clientId
+     * @param clientSecret
+     */
     fun init(
         baseUrl: String,
         clientId: String,
         clientSecret: String
     ) {
-        _baseUrl = baseUrl
-        _client = HttpClient(CIO) {
+        this.baseUrl = baseUrl
+        client = HttpClient(CIO) {
 
             defaultRequest {
                 header("accept", "application/json")
@@ -43,6 +54,7 @@ object PoliClient {
                     ignoreUnknownKeys = true
                 })
             }
+
             engine {
                 pipelining = true
             }
@@ -52,12 +64,22 @@ object PoliClient {
     }
 
 
+    /**
+     * TODO 로그를 찍어주는 Interceptor
+     *
+     * 1. Request 정보를 찍어준다.
+     * 2. Response 정보를 찍어준다.
+     */
     private fun addLoggerInterceptor() {
-        _client.sendPipeline.intercept(HttpSendPipeline.Before) {
+        if (::client.isInitialized.not()) {
+            throw IllegalStateException("PoliClient is not initialized")
+        }
+        client.sendPipeline.intercept(HttpSendPipeline.Before) {
             println()
             println("[Request]")
             println("Method: ${this.context.method.value}")
-            println("URL: ${this.context.url}")
+            println("URL: https://${this.context.url.host}${this.context.url.encodedPath}")
+            println("Parameter: ${this.context.url.parameters.entries()}")
             println("Header: ${this.context.headers.entries()}")
 
             val requestBody = context.body
@@ -92,7 +114,7 @@ object PoliClient {
      * @param jsonString
      * @return prettyJson
      */
-    fun prettyPrintJson(jsonString: String): String {
+    private fun prettyPrintJson(jsonString: String): String {
         var indentLevel = 0
         val indentSpace = 4
         val prettyJson = StringBuilder()

@@ -31,9 +31,7 @@ fun BLEScanButton(scanViewModel: ScanResultViewModel = viewModel()) {
                                 val address = vmItem.device.address
                                 scanItem.device.address == address
                             }
-                        if (scanResult == null) {
-                            scanViewModel.scanResults.add(scanItem)
-                        }
+                        if (scanResult == null) scanViewModel.scanResults.add(scanItem)
                     }
                 } else {
                     println("Permission denied: $deniedItems")

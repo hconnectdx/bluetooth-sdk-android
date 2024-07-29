@@ -1,20 +1,14 @@
 package kr.co.hconnect.polihealth_sdk_android_app.api.daily
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.util.AttributeKey
-import kotlinx.coroutines.runBlocking
-import kr.co.hconnect.polihealth_sdk_android_app.DateUtil
-import kr.co.hconnect.polihealth_sdk_android_app.PoliClient
-import kr.co.hconnect.polihealth_sdk_android_app.api.dto.request.HRSpO2
-import kr.co.hconnect.polihealth_sdk_android_app.api.dto.request.HRSpO2Request
+import kr.co.hconnect.polihealth_sdk_android.DateUtil
+import kr.co.hconnect.polihealth_sdk_android.PoliClient
+import kr.co.hconnect.polihealth_sdk_android.api.dto.request.LTMRequest
 import kr.co.hconnect.polihealth_sdk_android_app.api.dto.request.LTMModel
-import kr.co.hconnect.polihealth_sdk_android_app.api.dto.request.LTMRequest
-import kr.co.hconnect.polihealth_sdk_android_app.api.dto.response.SleepResponse
-import kr.co.hconnect.polihealth_sdk_android_app.api.dto.response.toSleepCommResponse
-import kr.co.hconnect.polihealth_sdk_android_app.api.sleep.SleepSessionAPI
+import kr.co.hconnect.polihealth_sdk_android.api.dto.response.Daily1Response
+import kr.co.hconnect.polihealth_sdk_android.api.dto.response.toDaily1Response
 
 object DailyProtocol01API {
     /**
@@ -23,12 +17,12 @@ object DailyProtocol01API {
      * @param reqDate ex) 20240704054513 (yyyyMMddHHmmss)
      * @param LTMModel
      *
-     * @return SleepCommResponse
+     * @return Protocol1Response
      * */
     suspend fun requestPost(
         reqDate: String,
         ltmModel: LTMModel
-    ): SleepResponse.SleepCommResponse {
+    ): Daily1Response {
 
         val requestBody = LTMRequest(
             reqDate = reqDate,
@@ -38,34 +32,9 @@ object DailyProtocol01API {
 
         val response = PoliClient.client.post("poli/day/protocol1") {
             setBody(requestBody)
-        }.call.attributes[AttributeKey("body")].toString().toSleepCommResponse()
+        }.call.attributes[AttributeKey("body")].toString().toDaily1Response(ltmModel)
 
         return response
-    }
-
-
-    @RequiresApi(Build.VERSION_CODES.Q)
-    fun testPost(
-        hrSpO2: HRSpO2
-    ) = runBlocking {
-        try {
-            val requestBody = HRSpO2Request(
-                reqDate = "20240704054513",
-                userSno = SleepSessionAPI.userSno,
-                data = HRSpO2Request.Data(
-                    oxygenVal = hrSpO2.spo2,
-                    heartRateVal = hrSpO2.heartRate
-                )
-            )
-
-            PoliClient.client.post("poli/day/protocol1") {
-                setBody(requestBody)
-            }.call.attributes[AttributeKey("body")].toString()
-
-
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
     }
 
     fun parseLTMData(data: ByteArray): LTMModel {
@@ -86,21 +55,29 @@ object DailyProtocol01API {
             // METs 데이터 추출 (2Bytes * 5EA)
             for (j in 0 until 5) {
                 val metsValue =
-                    ((data[offset + 2 * j].toInt() shl 8) or (data[offset + 2 * j + 1].toInt() and 0xFF)).toShort()
+                    ((data[offset + 2 * j].toInt() and 0xFF shl 8) or (data[offset + 2 * j + 1].toInt() and 0xFF)).toShort()
                         .toInt()
                 metsList.add(LTMModel.Mets(time, metsValue))
             }
 
             // Temp 데이터 추출 (4Bytes)
             val tempValue =
-                ((data[offset + 10].toInt() shl 24) or (data[offset + 11].toInt() and 0xFF shl 16) or (data[offset + 12].toInt() and 0xFF shl 8) or (data[offset + 13].toInt() and 0xFF))
-            skinTempList.add(LTMModel.SkinTemp(time, tempValue))
+                ((data[offset + 10].toInt() and 0xFF shl 24) or (data[offset + 11].toInt() and 0xFF shl 16) or (data[offset + 12].toInt() and 0xFF shl 8) or (data[offset + 13].toInt() and 0xFF))
+
+            val tempTime = DateUtil.getCurrentDateTime(minusMin = i * 5L)
+            skinTempList.add(
+                LTMModel.SkinTemp(
+                    tempTime,
+                    Float.fromBits(tempValue)
+                )
+            ) // i*5 분씩 감소 해야 함.
 
             // Lux 데이터 추출 (2Bytes)
             val luxValue =
-                ((data[offset + 14].toInt() shl 8) or (data[offset + 15].toInt() and 0xFF)).toShort()
-                    .toInt()
-            luxList.add(LTMModel.Lux(time, luxValue))
+                (data[offset + 14].toInt() and 0xFF shl 8) or (data[offset + 15].toInt() and 0xFF)
+
+            val luxTime = DateUtil.getCurrentDateTime(minusMin = i * 5L)
+            luxList.add(LTMModel.Lux(luxTime, luxValue))
 
             // 오프셋 증가
             offset += sampleSize
