@@ -58,29 +58,13 @@ override fun onStart() {
 
 ### 스캔 사용
 ```kotlin
-private fun startScan() {
-    val blePermissions =
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) Permissions.PERMISSION_SDK_31
-        else Permissions.PERMISSION_SDK_30
-    try {
-        PermissionManager.launchPermissions(blePermissions) {
-            val deniedItems = it.filter { p -> !p.value }
-            if (deniedItems.isEmpty()) {
-                PoliBLE.startScan { scanItem ->
-                    if (scanItem.device.name.isNullOrEmpty()) return@startScan
-                    deviceList.find { device -> device.address == scanItem.device.address }
-                        ?: run {
-                            deviceList.add(scanItem.device)
-                            deviceListAdapter.notifyDataSetChanged()
-                        }
-                }
-            } else {
-                println("Permission denied: $deniedItems")
-            }
+
+PoliBLE.startScan { scanItem ->
+    if (scanItem.device.name.isNullOrEmpty()) return@startScan
+        deviceList.find { device -> device.address == scanItem.device.address }?: run {
+            deviceList.add(scanItem.device)
+            deviceListAdapter.notifyDataSetChanged()
         }
-    } catch (e: Exception) {
-        println("Error: $e")
-    }
 }
 ```
 
