@@ -13,6 +13,7 @@
 
 
 ## PoliHealth SDK
+<img src="Screenshot_1723266947.png" width=250/>
 
 ### 주요 기능
 - **데이터 수집:** Poli 밴드를 통해 데이터를 수집합니다.
